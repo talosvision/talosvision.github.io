@@ -2324,7 +2324,7 @@
 
                     <video id="demo-player" controls autoplay loop muted playsinline>
 
-                        <source id="demo-source" src="24x60FPS1.mp4" type="video/mp4">
+                        <source id="demo-source" type="video/mp4">
 
                     </video>
 
@@ -4270,7 +4270,7 @@
 
         if (currentLang !== 'uk') {
 
-            reportHtml = await translateTextGTX(reportHtml, currentLang);
+            // Використовується рідна багатомовна таблиця TALOS
 
         }
 
@@ -5861,7 +5861,7 @@
 
         if (currentLang !== 'uk') {
 
-            ans = await translateTextGTX(ans, currentLang);
+            ans = window.tSlot('bot_ans_' + topicKey, currentLang) || ans;
 
         }
 
@@ -5999,7 +5999,7 @@
 
         if (currentLang !== 'uk') {
 
-            reply = await translateTextGTX(reply, currentLang);
+            // Відповідь з локалізованої бази TALOS
 
         }
 
@@ -6057,291 +6057,7 @@
 
 
 
-    const EN_FULL = {
-
-        nav_1: "Benefits", nav_2: "24 vs 60/144 Video", nav_3: "Specs", nav_4: "Pricing", nav_5: "About Us", nav_6: "FAQ",
-
-        nav_rev: "Reviews", f_link_rev: "User Reviews",
-
-        rev_title: "User Reviews & Real-World Hardware Benchmarks",
-
-        rev_sub: "See how <b>TALOS 60FPS (PRO &amp; LITE)</b> performs on real PCs, laptops, and connected TVs. Already purchased and tested the software? Leave your review below!",
-
-        rev_form_hdr: "✍️ Leave a Review After Purchase or Update Your Rating",
-
-        rev_form_desc: "Share your GPU or laptop model and your impressions. If you encountered a technical issue — leave your email so we can notify you when a patch is released and you can update your rating!",
-
-        rev_ph_name: "Your Name or Callsign *",
-
-        rev_ph_hw: "Your Hardware (e.g., RTX 3060 / Intel UHD Laptop / 120 Hz TV) *",
-
-        rev_opt_pro: "Edition: TALOS 60FPS PRO (RIFE AI)",
-
-        rev_opt_lite: "Edition: TALOS 60FPS LITE (MVTools2)",
-
-        rev_rate_lbl: "Rating:",
-
-        rev_ph_text: "🇺🇦 «Fortunately Russian is 404 by default, so reviews are in Ukrainian or English!)))» Describe your impressions: how smooth movies/anime became...",
-
-        rev_btn_submit: "🚀 Publish Review",
-
-        rev_joke_shield: "<b>TALOS is a guardian against enemies, so the language of Mordor «SHALL NOT PASS!»</b>",
-
-        rev_ph_email: "✉ Your Email (optional — for reply/update notification)",
-
-        rev_chk_update: "🔄 This is an update to my previous review / rating change after a patch",
-
-        nav_apollo: "🎙 Soon: APOLLO Audio Localizer",
-
-        hero_vet_badge: "UKRAINIAN COMBAT VETERAN R&D • OFFICIAL LABORATORY",
-
-        hero_release: "TALOS 60FPS VIDEO SUITE (POWERED BY MPC-HC FOR WINDOWS PC) • v6.5",
-
-        hero_tagline: "Cybernetic smoothness for movies & anime at <span class='grad-text'>60–144 FPS</span> on your PC or laptop",
-
-        hero_sub: "Eliminate 24fps judder. The standalone <b>TALOS 60FPS</b> software suite for <b>Windows 10/11</b> installs an enhanced <b>MPC-HC (Media Player Classic)</b> player integrated with <b>RIFE AI (Vulkan)</b> and <b>MVTools2 AVX2</b>. Watch on your PC monitor or output to any TV via <b>HDMI, DisplayPort, USB Type-C</b>, or wirelessly over <b>Wi-Fi</b>!",
-
-        btn_test_pc: "⚡ 1. Instant Online PC Test", btn_choose_ver: "🚀 2. Choose TALOS Edition (LITE / PRO)",
-
-        m_1: "Legendary MPC-HC player included", m_2_t: "1-Click", m_2: "Full Windows Registry integration", m_3: "Ideal for monitors & TVs via PC", m_4: "No subscriptions or cloud lag",
-
-        ben_title: "Engineering Advantages of TALOS 60FPS (MPC-HC Edition)", ben_sub: "All-in-one solution for desktop PCs and laptops running Windows 10/11:",
-
-        b1_t: "Enhanced MPC-HC Player + RIFE AI", b1_d: "Automatically deploys the latest MPC-HC player on your PC pre-wired with the RIFE v4.6 neural network for crystal-clear GPU frame generation.",
-
-        b2_t: "Smart Integer Multiplier", b2_d: "The player detects source video FPS (15, 24, 30) and applies an exact integer factor (x2–x6), keeping 100% of original movie frames intact.",
-
-        b3_t: "Scene Cut Detection (SCDetect)", b3_d: "Instantly recognizes camera cuts in action movies and anime, preventing warping artifacts at scene transitions.",
-
-        b4_t: "Control Center MPC (v6.5)", b4_d: "Dedicated Windows desktop control panel: switch display refresh rate (60/75/120/144 Hz), GPU, and CPU threads in one click.",
-
-        b5_t: "Low-End PC & Laptop Support (LITE)", b5_d: "No gaming GPU? TALOS LITE uses an AVX2-optimized ClangCL engine for MPC-HC that delivers 60 FPS even on integrated graphics.",
-
-        b6_t: "Silent MPC-HC Core Auto-Updater", b6_d: "No annoying popups or external redirects. Update the MPC-HC player core silently in the background with a single button click.",
-
-        calc_title: "Interactive Simulator: See how TALOS adapts frame rate to your screen",
-
-        calc_sub: "Click on the refresh rate of your monitor or connected TV:",
-
-        calc_res_60: "Movies 24fps &rarr; <b>48 FPS (x2 judder-free)</b> | Video 30fps &rarr; <b>60 FPS (x2)</b> | Anime 15fps &rarr; <b>60 FPS (x4)</b>",
-
-        demo_title: "See the Difference with Your Own Eyes",
-
-        demo_sub: "Select a mode (60 FPS in LITE style or 144 FPS in PRO style) and switch thematic playlists on the right:",
-
-        btn_vid_60: "🎬 Comparison: 24 FPS vs 60 FPS (LITE)",
-
-        btn_vid_144: "⚡ Comparison: 24 FPS vs 144 FPS (PRO)",
-
-        v_slot_desc: "New comparison videos are being uploaded to this YouTube playlist. Click below to visit our official YouTube channel!",
-
-        btn_yt_chan: "▶ More examples on our YouTube channel",
-
-        req_title: "System Requirements & Guaranteed Refresh Rates", req_sub: "Verified real-world PC performance specs for smooth playback without dropped frames:",
-
-        th_mode: "Target Mode & Edition", th_cpu: "Processor (CPU)", th_gpu: "Graphics Card (GPU)", th_ram: "RAM & OS", th_res: "Guaranteed Real-World Result",
-
-        r1_m: "60–75 Hz (TALOS LITE)", r1_c: "4+ Cores / 4–8 Threads (Intel Core i3/i5, AMD Ryzen 3/5)", r1_g: "Any Integrated (Intel UHD / Iris / Vega) or entry GPU (GT 1030 / GTX 750+)", r1_r: "4–8+ GB RAM<br>Windows 10/11 (x86/x64)", r1_res: "Stable <b>48–75 FPS (x2/x3)</b> in 720p & Full HD (1080p) powered by CPU",
-
-        r2_m: "120–144 Hz (TALOS LITE)", r2_c: "6–8+ Cores / 12–16+ Threads (Core i5-12400 / 13600K+, Ryzen 5 5600X+) with AVX2", r2_g: "Discrete GPU with D3D11 hardware decoder (GTX 1060 / 1650 / RX 570+)", r2_r: "8–16+ GB RAM<br>Windows 10/11 (x64)", r2_res: "Stable <b>120–144 FPS (x4/x5/x6)</b> in Full HD (1080p) on multi-threaded ClangCL core",
-
-        r3_m: "60–75 Hz (TALOS PRO AI)", r3_c: "6+ Cores / 12+ Threads (Intel Core i5-10400+, AMD Ryzen 5 3600+)", r3_g: "NVIDIA GeForce RTX series (RTX 2060 / 3060 / 4060+) or Radeon RX 6600+ (6–8+ GB VRAM)", r3_r: "16+ GB RAM<br>Windows 10/11 (x64)", r3_res: "Reference AI <b>48–75 FPS (x2/x3 RIFE v4.6)</b> in 1080p, 2K & 4K HDR without artifacts",
-
-        r4_m: "120–144+ Hz (TALOS PRO AI)", r4_c: "10–14+ Cores / 16–20+ Threads (Core i5-13600K / i7+, Ryzen 7 5800X3D / 7700X+)", r4_g: "High-End NVIDIA RTX 3080 / RTX 4070 / RTX 4070 Ti / 4080+ or RX 7800 XT+ (12+ GB VRAM)", r4_r: "16–32 GB RAM<br>Windows 10/11 (x64)", r4_res: "Maximum <b>120–144 FPS (x5/x6 RIFE AI)</b> in 1080p/2K and stable 60–120 FPS in heavy 4K HDR",
-
-        chk_title: "Step 1. Free Instant PC Hardware Diagnostic Right on the Website",
-
-        chk_desc: "No downloads or external apps needed! Click the button below — our built-in WebGL analyzer will scan your GPU, CPU threads, native physical display resolution (1080p / 2K / 4K), and monitor refresh rate (Hz) in 0.3 seconds to give an exact verdict: <b>TALOS PRO</b> or <b>TALOS LITE</b>.",
-
-        chk_btn_online: "⚡ Run Instant PC Hardware Test in Browser (Free)",
-
-        pr_title: "Choose Your TALOS 60FPS (MPC-HC) Edition",
-
-        pr_sub: "100% offline standalone installers for Windows 10/11. <b>1 License = 1 Device (HWID-bound, linked to your Email)</b>. Bonus for PC buyers (100%): <b>-50% discount on 1 additional LITE license strictly for your personal Windows tablet!</b>",
-
-        lite_badge: "FOR LAPTOPS & LOW-END PCs", pro_badge: "FLAGSHIP RIFE AI NEURAL ENGINE",
-
-        lite_price_main: "$10", lite_price_sub: "USD (1 PC / Laptop)",
-
-        pro_price_main: "$20", pro_price_sub: "USD (1 PC / Laptop)",
-
-        lite_desc: "MPC-HC Player + fast mathematical motion interpolation based on AviSynth+ and multi-threaded MVTools2 (ClangCL AVX2).",
-
-        l_1: "Works on any GPU (including Intel UHD / Iris / Vega integrated graphics)",
-
-        l_2: "Minimum requirements: PC/Laptop/Windows Tablet with 4 GB RAM, Windows 10/11",
-
-        l_3: "Multi-core CPU thread acceleration (Prefetch)",
-
-        l_4: "Hardware video decoding offload via DirectX GPU Preference",
-
-        l_5: "License for 1 device (HWID) + Control Center MPC v6.5 included",
-
-        pro_desc: "MPC-HC x64 Player + real-time AI frame generation powered by RIFE v4.6 (NCNN / Vulkan) with smart scene cut detection.",
-
-        p_1: "Reference contour clarity without halo or blur",
-
-        p_2: "Requirements: PC/Laptop with NVIDIA RTX / Radeon RX 6600+ GPU & 16+ GB RAM",
-
-        p_3: "Automatic integer multiplier for 60, 75, 120, and 144+ Hz monitors & TVs",
-
-        p_4: "Full support for 10-bit HDR and 4K UltraHD movies",
-
-        p_5: "License for 1 PC (HWID) + Eligible for -50% Windows Tablet LITE add-on",
-
-        btn_buy_lite: "Order TALOS LITE — $10", btn_buy_pro: "Order TALOS PRO — $20",
-
-        ab_title: "About Us: Unbreakable Ukrainian Engineering",
-
-        ab_sub: "Why a dedicated solo-engineered architecture outperforms bloated corporate suites:",
-
-        ab_h3: "TALOS VISION LABS — Independent Author's Project by an Armed Forces of Ukraine Veteran",
-
-        ab_p1: "Unlike faceless corporations, <b>TALOS VISION LABS</b> is built by one person — an active Ukrainian serviceman and veteran of the Armed Forces of Ukraine who, after sustaining a combat injury, channeled all his energy into software engineering, computer vision, and native AI systems.",
-
-        ab_p2: "When an entire software suite is engineered, refined, and tested by a single developer, there is zero bloatware, zero hidden telemetry, and zero corporate bureaucracy. Every algorithm built around the <b>MPC-HC</b> player is hand-tested on real hardware for rock-solid stability. By purchasing <b>TALOS 60FPS</b>, you get a finely crafted Ukrainian product and directly fund our next milestone — the <b>APOLLO AI</b> neural game & cinema audio localizer.",
-
-        faq_title: "Frequently Asked Questions (FAQ)",
-
-        q0: "Which media player is used, and how can I connect my PC to a TV (Cables or Wi-Fi)?",
-
-        a0: "The suite is built for <b>Windows 10/11 PCs and laptops</b> around the classic <b>MPC-HC (Media Player Classic Home Cinema)</b> player, included in the installer. It is not installed inside a Smart TV's firmware because RIFE AI requires a PC's GPU.<br><br><b>How to output video from your PC/laptop to a TV:</b><br>• <b>Wired (Best for 60–144 Hz with zero lag):</b> via <b>HDMI</b>, <b>DisplayPort</b>, or <b>USB Type-C (Thunderbolt)</b>.<br>• <b>Wireless over Wi-Fi (5 GHz / Wi-Fi 6):</b> via Windows Wireless Display (<b>Win + K</b> / Miracast) or high-refresh streaming apps like <b>Moonlight / Steam Link</b>. <i>(Note: Bluetooth only transmits audio; use a cable or Wi-Fi for video).</i>",
-
-        q1: "Does the software slow down my PC when I am not watching videos?",
-
-        a1: "No, 0% background load! TALOS runs strictly when a video file is open in the MPC-HC player. As soon as you close the player, RAM and GPU resources are freed immediately.",
-
-        q2: "Do I need to configure anything manually after installation?",
-
-        a2: "No. The installer automatically sets up the MPC-HC player, libraries, and all 54 DirectShow Registry parameters. Just open any movie and enjoy 60–144 FPS immediately.",
-
-        q3: "How is this better than Russian SVP 4?",
-
-        a3: "1) 100% independent Ukrainian software with no background telemetry services. 2) Honest <b>Integer Multiplier (x2 = 48 FPS for 24fps cinema & 60 FPS for 30fps video)</b> preserves 100% of original frames without the halo blur and stutter caused by SVP's fractional x2.5 blending. 3) Pure RIFE v4.6 AI enabled out of the box for 1080p/4K.",
-
-        q4: "How many devices is 1 license for, what if I reinstall Windows, and how does the -50% Tablet discount work?",
-
-        a4: "<b>1) Hardware Binding (1 License = 1 Device):</b> Each purchased license is activated on <b>1 specific device (HWID)</b> and permanently linked to <b>your Email</b>.<br><b>2) Free Recovery on Reinstall:</b> You can re-download the installer from your email receipt anytime — reinstalling Windows on the same PC keeps your license active forever.<br><b>3) Special 1+1 Bonus (-50% for a Windows Tablet):</b> Customers who have purchased a full license (100%) for their main PC/laptop are eligible for a <b>50% discount on 1 additional TALOS LITE license strictly for their personal Windows 10/11 tablet!</b>",
-
-        foot_about: "Independent Ukrainian software, computer vision, and neural audio localization R&D lab. Founded by a veteran of the Armed Forces of Ukraine.",
-
-        made_ua: "Made in Ukraine",
-
-        foot_map: "Sitemap", f_link_1: "Main Banner", f_link_2: "Technology Benefits", f_link_3: "24 vs 60/144 Video", f_link_4: "System Requirements", f_link_5: "Online PC Test", f_link_6: "PRO & LITE Pricing", f_link_7: "About Us",
-
-        foot_prod: "TALOS & APOLLO Ecosystem",
-
-        foot_apollo: "🎙 APOLLO: Ukrainian AI Audio Localizer for Games & Cinema (in development)",
-
-        foot_support: "Support & Contacts", foot_contact_text: "Have questions about compatibility, download recovery, or technical support?",
-
-        btn_copy_mail: "📋 Copy email to clipboard",
-
-        btn_open_bot: "🤖 24/7 AI Support Assistant",
-
-        foot_portal: "Official portal:",
-
-        foot_rights: "All rights reserved.", foot_lic: "License: Commercial software for Windows PC (1 License = 1 Device HWID).",
-
-        ap_badge: "🎙 PROJECT «APOLLO AI» • UKRAINIAN GAME & CINEMA AUDIO LOCALIZER (IN DEVELOPMENT)",
-
-        ap_title: "Apollo: Neural Game & Cinema Localization Preserving Original Actor Voice & Emotion",
-
-        ap_sub: "The first Ukrainian AI platform for cross-lingual audio localization (<b>Speech-to-Speech Cross-Lingual Voice Conversion</b>). We train neural networks to translate English audio to Ukrainian so that the <b>original world-famous actor's voice</b> and emotional performance speak pure Ukrainian.",
-
-        ap_c1: "Voice & Emotion Cloning: accurate replication of the actor's unique acoustic timbre, breath, rasp, and emotional state.",
-
-        ap_c2: "Performance-Preserving Translation: AI transfers dynamics, whispers, shouts, pauses, and intonations from the English original into Ukrainian.",
-
-        ap_c3: "Cross-Lingual Speech Synthesis: enables English-speaking actors to sound like natural native Ukrainian speakers without foreign accents.",
-
-        ap_c4: "Zero-Shot Voice Conversion: instant voice adaptation from short audio samples for massive RPG games and next-gen theatrical dubbing.",
-
-        ap_cta_t: "Want to accelerate APOLLO AI release and support development financially?",
-
-        ap_cta_d: "Training acoustic neural models requires significant GPU compute. Every purchase of <b>TALOS 60FPS</b> directly funds <b>APOLLO</b>, or you can back the lab with a targeted contribution:",
-
-        ap_cta_btn: "💎 Support APOLLO Development",
-
-        bot_header: "🤖 TALOS VISION AI SUPPORT ASSISTANT (24/7)",
-
-        bot_welcome: "Hello! I am the <b>TALOS VISION</b> engineering AI assistant. I understand questions about other players, TV connection (HDMI/DP/Type-C/Wi-Fi), 1-device HWID licensing, -50% Windows tablet discount, or APOLLO AI. Choose a topic or type below:",
-
-        bq_1: "PRO vs LITE?", bq_2: "Other players (VLC/PotPlayer)?", bq_3: "Connect to TV (Cable/Wi-Fi)?", bq_6: "1 Device / Reinstall / Tablet -50%?", bq_5: "APOLLO AI Project",
-
-        bot_ph: "Type your question here (e.g., how does the -50% Windows tablet discount work?)...",
-
-        bot_send: "Send",
-
-        em_hdr: "✉ QUICK MESSAGE TO TALOS VISION LABS",
-
-        em_desc: "Recipient <b>talosvision.labs@gmail.com</b> is already pre-filled automatically! Type your message below and click the button — a compact Gmail window will open with the address, subject, and text already filled in:",
-
-        em_to_auto: "✔ To (Pre-filled automatically): talosvision.labs@gmail.com",
-
-        em_subj_val: "TALOS VISION — Support / Order Inquiry",
-
-        em_body_ph: "Write your message here (or leave blank and type inside the Gmail window)...",
-
-        em_gmail: "✉ Open Ready Email in Gmail Window (100% Pre-filled!)",
-
-        em_copy: "📋 Copy address talosvision.labs@gmail.com",
-
-        egg_bronze_hdr: "🥉 ТАЄМНИЦЯ БРОНЗОВОГО ТИТАНА АКТИВОВАНА [5/5]",
-
-        egg_bronze_title: "Міф І: Як Гефест викував непереможного Талоса з бронзи!",
-
-        egg_bronze_text: "За давньогрецьким міфом, бог ковальства <b>Гефест</b> на прохання Зевса створив невтомного захисника острова Крит — велетня <b>Талоса</b>. Він узяв звичайну бронзу — метал, доступний кожному, — але вклав у нього настільки досконалу механіку, що бронзовий автомато́н <b>Талос</b> перевершив живих героїв. Так само редакція <b>TALOS LITE</b> завдяки векторній математиці перетворює звичайний процесор ноутбука на плавну 60 FPS систему!",
-
-        egg_bronze_rank: "🥉 БРОНЗОВА МЕДАЛЬ: FORGEMASTER OF HEPHAESTUS (LITE)",
-
-        egg_silver_hdr: "🥈 ТАЄМНИЦЯ БОЖЕСТВЕННОГО ІХОРУ АКТИВОВАНА [5/5]",
-
-        egg_silver_title: "Міф ІІ: Священна жила Талоса та Кібернетичний Зір!",
-
-        egg_silver_text: "За легендою, всередині бронзового тіла <b>Талоса</b> від шиї до п'яти проходила єдина магістральна жила, наповнена <b>Іхором</b> — променистою кров'ю богів Олімпу. Саме цей потік давав йому надлюдську швидкість (він тричі на день оббігав увесь острів Крит) та гострий зір. У версії <b>TALOS PRO</b> роль божественного Іхору виконує нейромережа <b>RIFE AI (Vulkan)</b>!",
-
-        egg_silver_rank: "🥈 СРІБНА МЕДАЛЬ: KEEPER OF THE DIVINE ICHOR (PRO)",
-
-        egg_gold_hdr: "🥇 СЕКРЕТНИЙ ПРОТОКОЛ «ТАЛОС» АКТИВОВАНО [5/5]",
-
-        egg_gold_title: "Вітаємо, уважний досліднику! Ти знайшов головне великоднє яйце лабораторії!",
-
-        egg_gold_text: "За стародавнім міфом, бронзовий велетень <b>Талос</b> невтомно оберігав свій острів, доки бог світла й мистецтва <b>Аполлон</b> дарував світу гармонію звуку. Сьогодні ця легенда оживає в українському коді, створеному ветераном ЗСУ. Дякуємо, що підтримуєш українську інженерну думку!",
-
-        egg_gold_rank: "🥇 ЗОЛОТА МЕДАЛЬ: HONORARY GUARDIAN OF TALOS VISION"
-
-    };
-
-
-
-    const EN_EGGS_PATCH = {
-
-        egg_bronze_hdr: "🥉 SECRET OF THE BRONZE TITAN ACTIVATED [5/5]",
-
-        egg_bronze_title: "Myth I: How Hephaestus Forged Unstoppable Talos from Bronze!",
-
-        egg_bronze_text: "According to ancient Greek myth, the god of the forge <b>Hephaestus</b>, at the request of Zeus, created a tireless defender of Crete — the giant <b>Talos</b>. He took ordinary bronze — a metal accessible to all — yet infused it with such flawless mechanics that the bronze automaton <b>Talos</b> surpassed mortal heroes. Likewise, <b>TALOS LITE</b> uses vector math to turn an everyday laptop CPU into a smooth 60 FPS system!",
-
-        egg_bronze_rank: "🥉 BRONZE MEDAL: FORGEMASTER OF HEPHAESTUS (LITE)",
-
-        egg_silver_hdr: "🥈 SECRET OF THE DIVINE ICHOR ACTIVATED [5/5]",
-
-        egg_silver_title: "Myth II: The Single Vein of Talos & Cybernetic Vision!",
-
-        egg_silver_text: "Legend says that inside <b>Talos</b> ran a single vital conduit filled with <b>Ichor</b> — the radiant lifeblood of the Olympian gods, granting him superhuman speed to circle Crete three times a day and flawless vision. In <b>TALOS PRO</b>, the <b>RIFE AI (Vulkan)</b> neural pipeline is that divine Ichor!",
-
-        egg_silver_rank: "🥈 SILVER MEDAL: KEEPER OF THE DIVINE ICHOR (PRO)",
-
-        egg_gold_hdr: "🥇 SECRET «TALOS» PROTOCOL ACTIVATED [5/5]",
-
-        egg_gold_title: "Congratulations, observant explorer! You found the lab's supreme Easter Egg!",
-
-        egg_gold_text: "In ancient myth, the bronze giant <b>Talos</b> tirelessly guarded his island while <b>Apollo</b> brought harmony of sound. Today this legend lives on in Ukrainian code built by a veteran of the Armed Forces of Ukraine. Thank you for supporting Ukrainian engineering!",
-
-        egg_gold_rank: "🥇 GOLD MEDAL: HONORARY GUARDIAN OF TALOS VISION"
-
-    };
+    const EN_FULL = {}; const EN_EGGS_PATCH = {}; // Англійська мова переведена на єдиний рівень з іншими 14 мовами у i18n_dict.js
 
 
 
@@ -6407,25 +6123,7 @@
 
 
 
-    async function translateTextGTX(text, targetLang) {
-
-        try {
-
-            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-
-            const res = await fetch(url);
-
-            const data = await res.json();
-
-            return data[0].map(x => x[0]).join("");
-
-        } catch (e) {
-
-            return text;
-
-        }
-
-    }
+    // [ВИДАЛЕНО GOOGLE TRANSLATE GTX — ПРАЦЮЄ ВИКЛЮЧНО ЕТАЛОННА БАЗА TALOS I18N]
 
 
 
@@ -6769,7 +6467,7 @@
 
     if (tbl[slotKey]) {
 
-      return tbl[slotKey][lg] || tbl[slotKey]['en'] || tbl[slotKey]['uk'] || '';
+      return tbl[slotKey][lg] || tbl[slotKey]['uk'] || '';
 
     }
 
