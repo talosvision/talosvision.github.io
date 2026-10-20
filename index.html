@@ -1935,28 +1935,52 @@
         }
 
     
-        /* ФІКС МОБІЛЬНИХ ВІКОН APOLLO, БОТА ТА ВІДЕО-ЗАСТАВКИ НА СМАРТФОНАХ (v10.10) */
-        .modal-window, .bot-modal-box {
-            max-width: calc(100vw - 20px) !important;
+        
+        /* ІДЕАЛЬНІ РОЗМІРИ ВІКОН НА ПК ТА СМАРТФОНАХ + ЗАХИСТ ХРЕСТИКА НА ЯПОНСЬКІЙ МОВІ (v10.12) */
+        .modal-window {
+            max-width: 780px;
+            width: 100%;
+            box-sizing: border-box !important;
+            overflow-x: hidden !important;
+        }
+        .bot-modal-box {
+            max-width: 680px;
+            width: 100%;
             box-sizing: border-box !important;
             overflow-x: hidden !important;
         }
         .modal-sticky-top, .bot-top-bar {
-            gap: 10px !important;
+            display: flex !important;
+            justify-content: space-between !important;
             align-items: center !important;
+            gap: 12px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
         }
         .modal-sticky-top .apollo-trigger-btn,
         .bot-top-bar .apollo-trigger-btn {
             white-space: normal !important;
             text-align: left !important;
-            line-height: 1.3 !important;
-            flex: 1 1 auto !important;
+            line-height: 1.35 !important;
+            flex: 0 1 auto !important;
+            max-width: calc(100% - 52px) !important;
             min-width: 0 !important;
             word-break: break-word !important;
-            padding: 6px 10px !important;
-            font-size: 0.76rem !important;
+            padding: 6px 12px !important;
+            font-size: 0.78rem !important;
+        }
+        .modal-close {
+            flex: 0 0 36px !important;
+            width: 36px !important;
+            height: 36px !important;
+            margin-left: auto !important;
         }
         @media (max-width: 768px) {
+            .modal-window, .bot-modal-box {
+                max-width: calc(100vw - 24px) !important;
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
             .steam-stage {
                 aspect-ratio: auto !important;
                 min-height: 220px !important;
@@ -3694,10 +3718,7 @@
 <!-- === START_MAIN_SCRIPT === -->
 <script>
 // ============================================================================
-// 🚀 TALOS VISION v10.11 — ЄДИНИЙ МОНОЛІТНИЙ ДВИГУН САЙТУ (БЕЗ REGEX-ПАТЧІВ)
-// 1. 16 мов (i18n_dict.js), 0% localStorage для відгуків.
-// 2. Плейлисти YouTube, мобільне Бургер-меню, zevs / яумі + прямий пароль 1313.
-// 3. 16-мовний WebGL-сканер заліза + детектор смартфонів + розумний ШІ-бот.
+// 🚀 TALOS VISION v10.12 — МОНОЛІТНИЙ ДВИГУН САЙТУ (УСІ ПУНКТИ 1..8 ВИПРАВЛЕНО)
 // ============================================================================
 
 ['talos_user_reviews_v1', 'talos_rev_cache_v82', 'talos_rev_cache_v106', 'talos_reviews_local', 'talos_gtx_i18n_v4'].forEach(function(k) {
@@ -3714,6 +3735,7 @@ let _currentRadarFilter = 'all';
 let _cachedCloudVisits = [];
 let _cachedCloudMedals = [];
 let _lastScanData = null;
+let _isSubmittingReview = false;
 
 const UK_ORIG = {};
 const UK_PLACEHOLDERS = {};
@@ -3727,7 +3749,7 @@ window.tSlot = function(slotKey, lang) {
     }
     var byL = window.TALOS_BY_LANG;
     if (byL && byL[lg] && byL[lg][slotKey]) return byL[lg][slotKey];
-    if (byL && byL['uk'] && byL['uk'][slotKey]) return byL[lg][slotKey];
+    if (byL && byL['uk'] && byL['uk'][slotKey]) return byL['uk'][slotKey];
     return '';
 };
 
@@ -3962,42 +3984,77 @@ window.renderSteamShowcase = function() {
     }
 };
 
-// 4. АВТОДІАГНОСТИКА ПК ПРЯМО В БРАУЗЕРІ (16 МОВ + ДЕТЕКТОР СМАРТФОНІВ):
+// 4. ОЧИЩЕННЯ НАЗВИ ВІДЕОКАРТИ ТА ТОЧНА МАТРИЦЯ В СКАНЕРІ ПК (ПУНКТИ 7 ТА 8):
 var SCANNER_I18N_16 = {
-    uk: { wait: "⏳ Сканування відеокарти (WebGL), потоків процесора та герцовки матриці...", gpu: "🎮 Відеокарта (GPU):", cpu: "🧠 Потоки процесора (CPU Threads):", disp: "🖥️ Фізична матриця та частота:", rec: "🏆 Рекомендована версія:", mob: "📱 <b>Увага (Мобільний пристрій):</b> Ви запустили тест зі смартфона/планшета ({gpu}). Комплекс <b>TALOS 60FPS</b> створено для комп’ютерів і ноутбуків з <b>Windows 10/11</b> — відкрийте цей тест на своєму ПК!" },
-    en: { wait: "⏳ Scanning GPU (WebGL), CPU Threads & Display Refresh Rate...", gpu: "🎮 Graphics Card (GPU):", cpu: "🧠 CPU Threads:", disp: "🖥️ Native Display & Refresh Rate:", rec: "🏆 Recommended Edition:", mob: "📱 <b>Mobile Device Detected ({gpu}):</b> <b>TALOS 60FPS</b> is designed for <b>Windows 10/11 PCs and laptops</b>. Please run this online test on your computer!" },
-    de: { wait: "⏳ Grafikkarte (WebGL), CPU-Threads & Bildwiederholfrequenz werden gescannt...", gpu: "🎮 Grafikkarte (GPU):", cpu: "🧠 Prozessor-Threads (CPU):", disp: "🖥️ Physische Auflösung & Frequenz:", rec: "🏆 Empfohlene Version:", mob: "📱 <b>Mobilgerät erkannt ({gpu}):</b> <b>TALOS 60FPS</b> wurde für <b>Windows 10/11 PCs und Laptops</b> entwickelt. Bitte starten Sie diesen Test auf Ihrem PC!" },
-    fr: { wait: "⏳ Analyse de la carte graphique (WebGL), des threads CPU et de la fréquence...", gpu: "🎮 Carte graphique (GPU) :", cpu: "🧠 Threads du processeur (CPU) :", disp: "🖥️ Résolution physique et fréquence :", rec: "🏆 Version recommandée :", mob: "📱 <b>Appareil mobile détecté ({gpu}) :</b> <b>TALOS 60FPS</b> est conçu pour les <b>PC et portables Windows 10/11</b>. Lancez ce test sur votre ordinateur !" },
-    pl: { wait: "⏳ Skanowanie karty graficznej (WebGL), wątków CPU i odświeżania ekranu...", gpu: "🎮 Karta graficzna (GPU):", cpu: "🧠 Wątki procesora (CPU):", disp: "🖥️ Fizyczna matryca i odświeżanie:", rec: "🏆 Zalecana wersja:", mob: "📱 <b>Wykryto urządzenie mobilne ({gpu}):</b> Pakiet <b>TALOS 60FPS</b> działa na komputerach i laptopach z <b>Windows 10/11</b>. Uruchom ten test na swoim PC!" },
-    es: { wait: "⏳ Escaneando tarjeta gráfica (WebGL), hilos de CPU y frecuencia de pantalla...", gpu: "🎮 Tarjeta gráfica (GPU):", cpu: "🧠 Hilos del procesador (CPU):", disp: "🖥️ Resolución física y frecuencia:", rec: "🏆 Versión recomendada:", mob: "📱 <b>Dispositivo móvil detectado ({gpu}):</b> <b>TALOS 60FPS</b> está diseñado para <b>PC y portátiles con Windows 10/11</b>. ¡Ejecuta este test en tu ordenador!" },
-    it: { wait: "⏳ Scansione scheda video (WebGL), thread CPU e frequenza dello schermo...", gpu: "🎮 Scheda video (GPU):", cpu: "🧠 Thread del processore (CPU):", disp: "🖥️ Matrice fisica e frequenza:", rec: "🏆 Versione consigliata:", mob: "📱 <b>Dispositivo mobile rilevato ({gpu}):</b> <b>TALOS 60FPS</b> è progettato per <b>PC e laptop Windows 10/11</b>. Avvia questo test sul tuo computer!" },
-    bg: { wait: "⏳ Сканиране на видеокартата (WebGL), процесорните нишки и честотата...", gpu: "🎮 Видеокарта (GPU):", cpu: "🧠 Процесорни нишки (CPU):", disp: "🖥️ Физическа матрица и честота:", rec: "🏆 Препоръчителна версия:", mob: "📱 <b>Открито е мобилно устройство ({gpu}):</b> <b>TALOS 60FPS</b> е за компютри и лаптопи с <b>Windows 10/11</b> — стартирайте теста на вашия компютър!" },
-    ja: { wait: "⏳ ビデオカード (WebGL)、CPUスレッド数、画面リフレッシュレートをスキャン中...", gpu: "🎮 ビデオカード (GPU):", cpu: "🧠 プロセッサースレッド数 (CPU):", disp: "🖥️ 物理マトリックス解像度と周波数:", rec: "🏆 推奨エディション:", mob: "📱 <b>モバイル端末を検出 ({gpu})：</b> <b>TALOS 60FPS</b> は <b>Windows 10/11 搭載のPC・ノートPC</b> 専用です。パソコンのブラウザからテストを実行してください！" },
-    cs: { wait: "⏳ Skenování grafické karty (WebGL), vláken CPU a obnovovací frekvence...", gpu: "🎮 Grafická karta (GPU):", cpu: "🧠 Vlákna procesoru (CPU):", disp: "🖥️ Fyzické rozlišení a frekvence:", rec: "🏆 Doporučená verze:", mob: "📱 <b>Detekováno mobilní zařízení ({gpu}):</b> <b>TALOS 60FPS</b> je určen pro <b>PC a notebooky s Windows 10/11</b>. Spusťte tento test na svém počítači!" },
-    ro: { wait: "⏳ Se scanează placa video (WebGL), firele CPU și rata de reîmprospătare...", gpu: "🎮 Placă video (GPU):", cpu: "🧠 Fire de execuție (CPU):", disp: "🖥️ Matrice fizică și frecvență:", rec: "🏆 Versiune recomandată:", mob: "📱 <b>Dispozitiv mobil detectat ({gpu}):</b> <b>TALOS 60FPS</b> este destinat <b>PC-urilor și laptopurilor cu Windows 10/11</b>. Rulați testul pe PC!" },
-    nl: { wait: "⏳ Videokaart (WebGL), CPU-threads en verversingssnelheid scannen...", gpu: "🎮 Videokaart (GPU):", cpu: "🧠 Processor-threads (CPU):", disp: "🖥️ Fysieke resolutie en frequentie:", rec: "🏆 Aanbevolen editie:", mob: "📱 <b>Mobiel apparaat gedetecteerd ({gpu}):</b> <b>TALOS 60FPS</b> is gemaakt voor <b>Windows 10/11 pc's en laptops</b>. Voer deze test uit op je pc!" },
-    pt: { wait: "⏳ A analisar placa gráfica (WebGL), threads do CPU e taxa de atualização...", gpu: "🎮 Placa gráfica (GPU):", cpu: "🧠 Threads do processador (CPU):", disp: "🖥️ Matriz física e frequência:", rec: "🏆 Edição recomendada:", mob: "📱 <b>Dispositivo móvel detetado ({gpu}):</b> O <b>TALOS 60FPS</b> foi desenvolvido para <b>PCs e portáteis Windows 10/11</b>. Execute este teste no seu computador!" },
-    sv: { wait: "⏳ Skannar grafikkort (WebGL), CPU-trådar och skärmens uppdateringsfrekvens...", gpu: "🎮 Grafikkort (GPU):", cpu: "🧠 Processortrådar (CPU):", disp: "🖥️ Fysisk upplösning och frekvens:", rec: "🏆 Rekommenderad version:", mob: "📱 <b>Mobilenhet upptäckt ({gpu}):</b> <b>TALOS 60FPS</b> är utvecklat för <b>Windows 10/11 datorer och laptops</b>. Kör testet på din PC!" },
-    tr: { wait: "⏳ Ekran kartı (WebGL), CPU iş parçacıkları ve yenileme hızı taranıyor...", gpu: "🎮 Ekran Kartı (GPU):", cpu: "🧠 İşlemci İş Parçacığı (CPU):", disp: "🖥️ Fiziksel Çözünürlük ve Hız:", rec: "🏆 Önerilen Sürüm:", mob: "📱 <b>Mobil Cihaz Algılandı ({gpu}):</b> <b>TALOS 60FPS</b>, <b>Windows 10/11 bilgisayarlar ve dizüstü bilgisayarlar</b> içindir. Lütfen testi bilgisayarınızda çalıştırın!" },
-    ko: { wait: "⏳ 그래픽 카드(WebGL), CPU 스레드 및 모니터 주사율 스캔 중...", gpu: "🎮 그래픽 카드 (GPU):", cpu: "🧠 프로세서 스레드 (CPU):", disp: "🖥️ 물리적 해상도 및 주사율:", rec: "🏆 권장 에디션:", mob: "📱 <b>모바일 기기 감지됨 ({gpu}):</b> <b>TALOS 60FPS</b>는 <b>Windows 10/11 PC 및 노트북</b> 전용입니다. PC 브라우저에서 테스트를 실행해 주세요!" }
+    uk: { wait: "⏳ Сканування відеокарти (WebGL), потоків процесора та герцовки матриці...", gpu: "🎮 Відеокарта (GPU):", cpu: "🧠 Потоки процесора (CPU Threads):", disp: "🖥️ Фізична матриця та частота:", rec: "🏆 Рекомендована версія:", mobVerdict: "❌ Несумісний пристрій (Смартфон / Мобільна ОС) — Тільки для Windows 10/11 ПК", mob: "📱 <b>Увага (Мобільний пристрій):</b> Ви запустили тест зі смартфона ({gpu}). Комплекс <b>TALOS 60FPS</b> встановлюється виключно на комп’ютери, ноутбуки та планшети під керуванням <b>Windows 10/11</b> — відкрийте цей тест на своєму ПК!" },
+    en: { wait: "⏳ Scanning GPU (WebGL), CPU Threads & Display Refresh Rate...", gpu: "🎮 Graphics Card (GPU):", cpu: "🧠 CPU Threads:", disp: "🖥️ Native Display & Refresh Rate:", rec: "🏆 Recommended Edition:", mobVerdict: "❌ Incompatible Device (Smartphone / Mobile OS) — Windows 10/11 PC Required", mob: "📱 <b>Mobile Device Detected ({gpu}):</b> <b>TALOS 60FPS</b> is designed exclusively for <b>Windows 10/11 PCs, laptops, and tablets</b>. Please run this test on your computer!" },
+    de: { wait: "⏳ Grafikkarte (WebGL), CPU-Threads & Bildwiederholfrequenz werden gescannt...", gpu: "🎮 Grafikkarte (GPU):", cpu: "🧠 Prozessor-Threads (CPU):", disp: "🖥️ Physische Auflösung & Frequenz:", rec: "🏆 Empfohlene Version:", mobVerdict: "❌ Inkompatibles Gerät (Smartphone / Mobile OS) — Nur für Windows 10/11 PC", mob: "📱 <b>Mobilgerät erkannt ({gpu}):</b> <b>TALOS 60FPS</b> wurde exklusiv für <b>Windows 10/11 PCs und Laptops</b> entwickelt. Bitte starten Sie diesen Test auf Ihrem PC!" },
+    fr: { wait: "⏳ Analyse de la carte graphique (WebGL), des threads CPU et de la fréquence...", gpu: "🎮 Carte graphique (GPU) :", cpu: "🧠 Threads du processeur (CPU) :", disp: "🖥️ Résolution physique et fréquence :", rec: "🏆 Version recommandée :", mobVerdict: "❌ Appareil incompatible (Smartphone / OS Mobile) — PC Windows 10/11 requis", mob: "📱 <b>Appareil mobile détecté ({gpu}) :</b> <b>TALOS 60FPS</b> est conçu exclusivement pour les <b>PC et portables Windows 10/11</b>. Lancez ce test sur votre ordinateur !" },
+    pl: { wait: "⏳ Skanowanie karty graficznej (WebGL), wątków CPU i odświeżania ekranu...", gpu: "🎮 Karta graficzna (GPU):", cpu: "🧠 Wątki procesora (CPU):", disp: "🖥️ Fizyczna matryca i odświeżanie:", rec: "🏆 Zalecana wersja:", mobVerdict: "❌ Niekompatybilne urządzenie (Smartfon) — Wymagany PC z Windows 10/11", mob: "📱 <b>Wykryto urządzenie mobilne ({gpu}):</b> Pakiet <b>TALOS 60FPS</b> działa wyłącznie na komputerach i laptopach z <b>Windows 10/11</b>. Uruchom ten test na swoim PC!" },
+    es: { wait: "⏳ Escaneando tarjeta gráfica (WebGL), hilos de CPU y frecuencia de pantalla...", gpu: "🎮 Tarjeta gráfica (GPU):", cpu: "🧠 Hilos del procesador (CPU):", disp: "🖥️ Resolución física y frecuencia:", rec: "🏆 Versión recomendada:", mobVerdict: "❌ Dispositivo incompatible (Smartphone) — Requiere PC con Windows 10/11", mob: "📱 <b>Dispositivo móvil detectado ({gpu}):</b> <b>TALOS 60FPS</b> está diseñado exclusivamente para <b>PC y portátiles con Windows 10/11</b>. ¡Ejecuta este test en tu ordenador!" },
+    it: { wait: "⏳ Scansione scheda video (WebGL), thread CPU e frequenza dello schermo...", gpu: "🎮 Scheda video (GPU):", cpu: "🧠 Thread del processore (CPU):", disp: "🖥️ Matrice fisica e frequenza:", rec: "🏆 Versione consigliata:", mobVerdict: "❌ Dispositivo non compatibile (Smartphone) — Richiede PC Windows 10/11", mob: "📱 <b>Dispositivo mobile rilevato ({gpu}):</b> <b>TALOS 60FPS</b> è progettato esclusivamente per <b>PC e laptop Windows 10/11</b>. Avvia questo test sul tuo computer!" },
+    bg: { wait: "⏳ Сканиране на видеокартата (WebGL), процесорните нишки и честотата...", gpu: "🎮 Видеокарта (GPU):", cpu: "🧠 Процесорни нишки (CPU):", disp: "🖥️ Физическа матрица и честота:", rec: "🏆 Препоръчителна версия:", mobVerdict: "❌ Несъвместимо устройство (Смартфон) — Само за Windows 10/11 PC", mob: "📱 <b>Открито е мобилно устройство ({gpu}):</b> <b>TALOS 60FPS</b> е само за компютри и лаптопи с <b>Windows 10/11</b> — стартирайте теста на вашия компютър!" },
+    ja: { wait: "⏳ ビデオカード (WebGL)、CPUスレッド数、画面リフレッシュレートをスキャン中...", gpu: "🎮 ビデオカード (GPU):", cpu: "🧠 プロセッサースレッド数 (CPU):", disp: "🖥️ 物理マトリックス解像度と周波数:", rec: "🏆 推奨エディション:", mobVerdict: "❌ 非対応デバイス (スマートフォン / モバイルOS) — Windows 10/11 PC専用", mob: "📱 <b>モバイル端末を検出 ({gpu})：</b> <b>TALOS 60FPS</b> は <b>Windows 10/11 搭載のPC・ノートPC</b> 専用ソフトウェアです。パソコンのブラウザからテストを実行してください！" },
+    cs: { wait: "⏳ Skenování grafické karty (WebGL), vláken CPU a obnovovací frekvence...", gpu: "🎮 Grafická karta (GPU):", cpu: "🧠 Vlákna procesoru (CPU):", disp: "🖥️ Fyzické rozlišení a frekvence:", rec: "🏆 Doporučená verze:", mobVerdict: "❌ Nekompatibilní zařízení (Smartphon) — Vyžadován PC s Windows 10/11", mob: "📱 <b>Detekováno mobilní zařízení ({gpu}):</b> <b>TALOS 60FPS</b> je určen výhradně pro <b>PC a notebooky s Windows 10/11</b>. Spusťte tento test na svém počítači!" },
+    ro: { wait: "⏳ Se scanează placa video (WebGL), firele CPU și rata de reîmprospătare...", gpu: "🎮 Placă video (GPU):", cpu: "🧠 Fire de execuție (CPU):", disp: "🖥️ Matrice fizică și frecvență:", rec: "🏆 Versiune recomandată:", mobVerdict: "❌ Dispozitiv incompatibil (Smartphone) — Necesită PC cu Windows 10/11", mob: "📱 <b>Dispozitiv mobil detectat ({gpu}):</b> <b>TALOS 60FPS</b> este destinat exclusiv <b>PC-urilor și laptopurilor cu Windows 10/11</b>. Rulați testul pe PC!" },
+    nl: { wait: "⏳ Videokaart (WebGL), CPU-threads en verversingssnelheid scannen...", gpu: "🎮 Videokaart (GPU):", cpu: "🧠 Processor-threads (CPU):", disp: "🖥️ Fysieke resolutie en frequentie:", rec: "🏆 Aanbevolen editie:", mobVerdict: "❌ Niet-ondersteund apparaat (Smartphone) — Alleen voor Windows 10/11 PC", mob: "📱 <b>Mobiel apparaat gedetecteerd ({gpu}):</b> <b>TALOS 60FPS</b> is exclusief gemaakt voor <b>Windows 10/11 pc's en laptops</b>. Voer deze test uit op je pc!" },
+    pt: { wait: "⏳ A analisar placa gráfica (WebGL), threads do CPU e taxa de atualização...", gpu: "🎮 Placa gráfica (GPU):", cpu: "🧠 Threads do processador (CPU):", disp: "🖥️ Matriz física e frequência:", rec: "🏆 Edição recomendada:", mobVerdict: "❌ Dispositivo incompatível (Smartphone) — Requer PC Windows 10/11", mob: "📱 <b>Dispositivo móvel detetado ({gpu}):</b> O <b>TALOS 60FPS</b> foi desenvolvido exclusivamente para <b>PCs e portáteis Windows 10/11</b>. Execute este teste no seu computador!" },
+    sv: { wait: "⏳ Skannar grafikkort (WebGL), CPU-trådar och skärmens uppdateringsfrekvens...", gpu: "🎮 Grafikkort (GPU):", cpu: "🧠 Processortrådar (CPU):", disp: "🖥️ Fysisk upplösning och frekvens:", rec: "🏆 Rekommenderad version:", mobVerdict: "❌ Inkompatibel enhet (Smartphone) — Kräver Windows 10/11 PC", mob: "📱 <b>Mobilenhet upptäckt ({gpu}):</b> <b>TALOS 60FPS</b> är utvecklat uteslutande för <b>Windows 10/11 datorer och laptops</b>. Kör testet på din PC!" },
+    tr: { wait: "⏳ Ekran kartı (WebGL), CPU iş parçacıkları ve yenileme hızı taranıyor...", gpu: "🎮 Ekran Kartı (GPU):", cpu: "🧠 İşlemci İş Parçacığı (CPU):", disp: "🖥️ Fiziksel Çözünürlük ve Hız:", rec: "🏆 Önerilen Sürüm:", mobVerdict: "❌ Uyumsuz Cihaz (Akıllı Telefon) — Yalnızca Windows 10/11 PC İçin", mob: "📱 <b>Mobil Cihaz Algılandı ({gpu}):</b> <b>TALOS 60FPS</b>, yalnızca <b>Windows 10/11 bilgisayarlar ve dizüstü bilgisayarlar</b> içindir. Lütfen testi bilgisayarınızda çalıştırın!" },
+    ko: { wait: "⏳ 그래픽 카드(WebGL), CPU 스레드 및 모니터 주사율 스캔 중...", gpu: "🎮 그래픽 카드 (GPU):", cpu: "🧠 프로세서 스레드 (CPU):", disp: "🖥️ 물리적 해상도 및 주사율:", rec: "🏆 권장 에디션:", mobVerdict: "❌ 호환되지 않는 기기 (스마트폰 / 모바일 OS) — Windows 10/11 PC 전용", mob: "📱 <b>모바일 기기 감지됨 ({gpu}):</b> <b>TALOS 60FPS</b>는 <b>Windows 10/11 PC 및 노트북</b> 전용 소프트웨어입니다. PC 브라우저에서 테스트를 실행해 주세요!" }
 };
+
+function cleanWebGlGpuName(raw) {
+    if (!raw) return "Integrated Graphics";
+    var s = String(raw);
+    // Прибираємо обгортку ANGLE (...):
+    var m = s.match(/^ANGLE\s*\((.*)\)$/i);
+    if (m) s = m[1];
+    // Прибираємо технічні хвости Direct3D11, vs_5_0, ps_5_0, OpenGL ES, PCI ID (0x00002782):
+    s = s.replace(/\s*\(0x[0-9a-fA-F]+\)/g, '');
+    s = s.replace(/,?\s*Direct3D\d+.*$/i, '');
+    s = s.replace(/,?\s*D3D\d+.*$/i, '');
+    s = s.replace(/,?\s*OpenGL\s*ES.*$/i, '');
+    s = s.replace(/\b(NVIDIA|AMD|Intel|Qualcomm)\s*,\s*\1\b/gi, '$1');
+    return s.trim() || raw;
+}
+
+function snapStandardResolution(w, h) {
+    var standards = [
+        [3840, 2160, " (4K UHD)"],
+        [2560, 1440, " (2K QHD)"],
+        [1920, 1080, " (Full HD)"],
+        [1920, 1200, " (WUXGA)"],
+        [1366, 768, " (HD)"],
+        [1280, 720, " (HD)"]
+    ];
+    for (var i = 0; i < standards.length; i++) {
+        var sw = standards[i][0], sh = standards[i][1], tag = standards[i][2];
+        if (Math.abs(w - sw) <= 6 && Math.abs(h - sh) <= 6) {
+            return sw + "×" + sh + tag;
+        }
+    }
+    return w + "×" + h;
+}
 
 function renderHardwareScanResultBox() {
     var box = document.getElementById('web-scan-result');
     if (!box || !_lastScanData) return;
     var loc = SCANNER_I18N_16[currentLang] || SCANNER_I18N_16['en'];
     var d = _lastScanData;
+    var verdictText = d.isMobile ? loc.mobVerdict : d.verdict;
+    var verdictColor = d.isMobile ? '#ff4d6d' : d.vColor;
     var mobHtml = d.isMobile
-        ? '<div style="margin-top:8px; padding:11px 14px; border-radius:10px; background:rgba(255,184,77,0.12); border:1px solid var(--neon-gold); color:var(--neon-gold); font-size:0.86rem; line-height:1.45;">' + loc.mob.replace('{gpu}', d.gpu) + '</div>'
+        ? '<div style="margin-top:8px; padding:11px 14px; border-radius:10px; background:rgba(255,77,109,0.12); border:1px solid #ff4d6d; color:#ffb84d; font-size:0.86rem; line-height:1.45;">' + loc.mob.replace('{gpu}', d.gpu) + '</div>'
         : '';
 
     box.innerHTML =
         '<div style="display:grid; gap:8px; font-size:0.94rem;">' +
         '<div><b>' + loc.gpu + '</b> <span style="color:var(--neon-blue); font-weight:700;">' + d.gpu + '</span></div>' +
         '<div><b>' + loc.cpu + '</b> <b>' + d.cores + '</b></div>' +
-        '<div><b>' + loc.disp + '</b> <b>' + d.realW + '×' + d.realH + ' @ ~' + d.stdHz + ' Hz</b></div>' +
-        '<div style="margin-top:8px; padding-top:10px; border-top:1px solid var(--border-glass); font-size:1.05rem;">' +
-        '<b>' + loc.rec + '</b> <span style="color:' + d.vColor + '; font-weight:900;">' + d.verdict + '</span></div>' +
+        '<div><b>' + loc.disp + '</b> <b>' + d.resStr + ' @ ~' + d.stdHz + ' Hz</b></div>' +
+        '<div style="margin-top:8px; padding-top:10px; border-top:1px solid var(--border-glass); font-size:1.02rem;">' +
+        '<b>' + loc.rec + '</b> <span style="color:' + verdictColor + '; font-weight:900;">' + verdictText + '</span></div>' +
         mobHtml + '</div>';
 }
 
@@ -4009,19 +4066,21 @@ window.runInstantBrowserHardwareScan = async function() {
     box.innerHTML = '<p style="text-align:center; color:var(--neon-blue); font-weight:700;">' + loc.wait + '</p>';
 
     var cores = navigator.hardwareConcurrency || 4;
-    var gpu = 'Integrated Graphics';
+    var rawGpu = 'Integrated Graphics';
     try {
         var canvas = document.createElement('canvas');
         var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
         if (gl) {
             var dbg = gl.getExtension('WEBGL_debug_renderer_info');
-            if (dbg) gpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
+            if (dbg) rawGpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
         }
     } catch (e) {}
 
+    var gpu = cleanWebGlGpuName(rawGpu);
     var dpr = window.devicePixelRatio || 1;
     var realW = Math.round(window.screen.width * dpr);
     var realH = Math.round(window.screen.height * dpr);
+    var resStr = snapStandardResolution(realW, realH);
 
     var measuredHz = await new Promise(function(resolve) {
         var frames = 0;
@@ -4039,7 +4098,7 @@ window.runInstantBrowserHardwareScan = async function() {
     });
 
     var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '') ||
-                   /Adreno|Mali|PowerVR|Apple GPU/i.test(gpu) ||
+                   /Adreno|Mali|PowerVR|Apple GPU/i.test(rawGpu) ||
                    (window.screen.height > window.screen.width && window.screen.width < 900);
 
     var isProGpu = !isMobile && /RTX|GTX 166|GTX 107|GTX 108|RX 66|RX 67|RX 68|RX 69|RX 76|RX 77|RX 78|RX 79|Arc A7/i.test(gpu);
@@ -4047,11 +4106,11 @@ window.runInstantBrowserHardwareScan = async function() {
     var verdict = isPro ? 'TALOS 60FPS PRO (RIFE AI v4.6 Vulkan)' : 'TALOS 60FPS LITE (MVTools2 ClangCL AVX2)';
     var vColor = isPro ? 'var(--neon-green)' : 'var(--neon-gold)';
 
-    _lastScanData = { gpu: gpu, cores: cores, realW: realW, realH: realH, stdHz: stdHz, verdict: verdict, vColor: vColor, isMobile: isMobile };
+    _lastScanData = { gpu: gpu, cores: cores, resStr: resStr, stdHz: stdHz, verdict: verdict, vColor: vColor, isMobile: isMobile };
     renderHardwareScanResultBox();
 };
 
-// 5. ВІДГУКИ КОРИСТУВАЧІВ (0% LOCALSTORAGE — ЧИТАЄТЬСЯ ВИКЛЮЧНО З БАЗИ reviews_db.js):
+// 5. ВІДГУКИ КОРИСТУВАЧІВ (ОЧИЩЕННЯ УСІХ ПОЛІВ ФОРМИ + ЗАХИСТ ВІД ПОДВІЙНОГО КЛІКУ):
 var PENDING_I18N_NOTICE = {
     en: "⏳ Preparing 2-pass neural AI translation into English (~15–30 sec). Please refresh the page shortly!",
     de: "⏳ 2-stufige neuronale KI-Übersetzung ins Deutsche wird vorbereitet (~15–30 Sek.). Bitte Seite in Kürze aktualisieren!",
@@ -4090,22 +4149,22 @@ var REV_MSG_EMPTY_16 = {
 };
 
 var REV_MSG_OK_16 = {
-    uk: "✅ Надіслано в хмарний центр TALOS! Лист відправлено, а відгук і його 16 перекладів з’являться на сайті після синхронізації GitHub (~30 сек).",
-    en: "✅ Sent to TALOS Cloud! Your review and its 16 AI translations will appear after GitHub sync (~30 sec).",
-    de: "✅ An TALOS Cloud gesendet! Ihre Bewertung erscheint nach der GitHub-Synchronisierung (~30 Sek.) in 16 Sprachen.",
-    fr: "✅ Envoyé au cloud TALOS ! Votre avis et ses 16 traductions IA apparaîtront après synchronisation GitHub (~30 sec).",
-    pl: "✅ Wysłano do chmury TALOS! Twoja opinia i jej 16 tłumaczeń AI pojawi się po synchronizacji GitHub (~30 sek.).",
-    es: "✅ ¡Enviado a TALOS Cloud! Tu reseña y sus 16 traducciones IA aparecerán tras la sincronización (~30 seg).",
-    it: "✅ Inviato a TALOS Cloud! La tua recensione e le 16 traduzioni IA appariranno dopo la sincronizzazione (~30 sec).",
-    bg: "✅ Изпратено до облака TALOS! Вашият отзив и 16-те превода ще се появят след синхронизацията (~30 сек).",
-    ja: "✅ TALOSクラウドへ送信されました！GitHub同期後（約30秒）に16言語すべてのAI翻訳とともに掲載されます。",
-    cs: "✅ Odesláno do cloudu TALOS! Vaše recenze se zobrazí v 16 jazycích po synchronizaci GitHubu (~30 sek.).",
-    ro: "✅ Trimis în cloud-ul TALOS! Recenzia dvs. în 16 limbi va apărea după sincronizarea GitHub (~30 sec).",
-    nl: "✅ Verzonden naar TALOS Cloud! Je recensie verschijnt na GitHub-synchronisatie (~30 sec) in 16 talen.",
-    pt: "✅ Enviado para a nuvem TALOS! A sua avaliação aparecerá em 16 idiomas após a sincronização (~30 seg).",
-    sv: "✅ Skickat till TALOS Cloud! Din recension visas på 16 språk efter GitHub-synkronisering (~30 sek).",
-    tr: "✅ TALOS Bulut'a gönderildi! Değerlendirmeniz (~30 sn) içinde 16 dilde sitede yayınlanacaktır.",
-    ko: "✅ TALOS 클라우드로 전송되었습니다! 약 30초 후 GitHub 동기화가 완료되면 16개 국어 AI 번역과 함께 게시됩니다."
+    uk: "✅ Надіслано в хмарний центр TALOS! Лист відправлено, а відгук і його 16 перекладів з’являться на сайті після синхронізації GitHub (~25 сек).",
+    en: "✅ Sent to TALOS Cloud! Your review and its 16 AI translations will appear after GitHub sync (~25 sec).",
+    de: "✅ An TALOS Cloud gesendet! Ihre Bewertung erscheint nach der GitHub-Synchronisierung (~25 Sek.) in 16 Sprachen.",
+    fr: "✅ Envoyé au cloud TALOS ! Votre avis et ses 16 traductions IA apparaîtront après synchronisation GitHub (~25 sec).",
+    pl: "✅ Wysłano do chmury TALOS! Twoja opinia i jej 16 tłumaczeń AI pojawi się po synchronizacji GitHub (~25 sek.).",
+    es: "✅ ¡Enviado a TALOS Cloud! Tu reseña y sus 16 traducciones IA aparecerán tras la sincronización (~25 seg).",
+    it: "✅ Inviato a TALOS Cloud! La tua recensione e le 16 traduzioni IA appariranno dopo la sincronizzazione (~25 sec).",
+    bg: "✅ Изпратено до облака TALOS! Вашият отзив и 16-те превода ще се появят след синхронизацията (~25 сек).",
+    ja: "✅ TALOSクラウドへ送信されました！GitHub同期後（約25秒）に16言語すべてのAI翻訳とともに掲載されます。",
+    cs: "✅ Odesláno do cloudu TALOS! Vaše recenze se zobrazí v 16 jazycích po synchronizaci GitHubu (~25 sek.).",
+    ro: "✅ Trimis în cloud-ul TALOS! Recenzia dvs. în 16 limbi va apărea după sincronizarea GitHub (~25 sec).",
+    nl: "✅ Verzonden naar TALOS Cloud! Je recensie verschijnt na GitHub-synchronisatie (~25 sec) in 16 talen.",
+    pt: "✅ Enviado para a nuvem TALOS! A sua avaliação aparecerá em 16 idiomas após a sincronização (~25 seg).",
+    sv: "✅ Skickat till TALOS Cloud! Din recension visas på 16 språk efter GitHub-synkronisering (~25 sek).",
+    tr: "✅ TALOS Bulut'a gönderildi! Değerlendirmeniz (~25 sn) içinde 16 dilde sitede yayınlanacaktır.",
+    ko: "✅ TALOS 클라우드로 전송되었습니다! 약 25초 후 GitHub 동기화가 완료되면 16개 국어 AI 번역과 함께 게시됩니다."
 };
 
 var EMAIL_ORDER_SUBJ_16 = {
@@ -4178,7 +4237,20 @@ window.renderReviewsList = async function() {
     var container = document.getElementById('reviews-container');
     if (!container) return;
     var cfg = window.TALOS_CONFIG || {};
-    var allReviews = window.TALOS_APPROVED_REVIEWS || cfg.approvedReviews || [];
+    var rawReviews = window.TALOS_APPROVED_REVIEWS || cfg.approvedReviews || [];
+
+    // Фільтр від дублів на рівні рендерингу:
+    var seenKeys = {};
+    var allReviews = [];
+    for (var k = 0; k < rawReviews.length; k++) {
+        var rItem = rawReviews[k];
+        var uKey = String(rItem.nameUk || '').trim().toLowerCase() + '::' + String(rItem.textUk || '').trim().toLowerCase();
+        if (!seenKeys[uKey]) {
+            seenKeys[uKey] = true;
+            allReviews.push(rItem);
+        }
+    }
+
     window._CURRENT_MERGED_REVIEWS = allReviews;
     var isUk = (currentLang === 'uk');
     var isAdminUnlocked = (sessionStorage.getItem('talos_diag_auth') === '1');
@@ -4243,14 +4315,38 @@ window.renderReviewsList = async function() {
     container.innerHTML = htmlCards.join('');
 };
 
+// Автоматичне підвантаження свіжих reviews_db.js та i18n_dict.js з GitHub без Ctrl+F5:
+function reloadReviewsAndDictFromServer() {
+    var ts = Date.now();
+    var s1 = document.createElement('script');
+    s1.src = 'reviews_db.js?v=' + ts;
+    s1.onload = function() {
+        var s2 = document.createElement('script');
+        s2.src = 'i18n_dict.js?v=' + ts;
+        s2.onload = function() {
+            window.renderReviewsList();
+        };
+        document.head.appendChild(s2);
+    };
+    document.head.appendChild(s1);
+}
+
 window.submitUserReview = async function() {
-    var name = (document.getElementById('rev-name').value || '').trim();
-    var hw = (document.getElementById('rev-hw').value || '').trim();
-    var email = (document.getElementById('rev-email').value || '').trim();
-    var edition = document.getElementById('rev-edition').value;
-    var text = (document.getElementById('rev-text').value || '').trim();
-    var isUpd = document.getElementById('rev-is-update').checked;
+    if (_isSubmittingReview) return;
+    var nameEl = document.getElementById('rev-name');
+    var hwEl = document.getElementById('rev-hw');
+    var emailEl = document.getElementById('rev-email');
+    var edEl = document.getElementById('rev-edition');
+    var textEl = document.getElementById('rev-text');
+    var updEl = document.getElementById('rev-is-update');
     var statusMsg = document.getElementById('rev-status-msg');
+
+    var name = (nameEl.value || '').trim();
+    var hw = (hwEl.value || '').trim();
+    var email = (emailEl.value || '').trim();
+    var edition = edEl.value;
+    var text = (textEl.value || '').trim();
+    var isUpd = updEl.checked;
 
     if (!name || !hw || !text) {
         if (statusMsg) {
@@ -4269,6 +4365,9 @@ window.submitUserReview = async function() {
         return;
     }
 
+    _isSubmittingReview = true;
+    setTimeout(function() { _isSubmittingReview = false; }, 6000);
+
     var now = new Date();
     var dateStr = String(now.getDate()).padStart(2, '0') + '.' + String(now.getMonth() + 1).padStart(2, '0') + '.' + now.getFullYear();
 
@@ -4282,6 +4381,14 @@ window.submitUserReview = async function() {
         date: dateStr,
         email: email || 'Не вказано'
     };
+
+    // МИТТЄВЕ ОЧИЩЕННЯ УСІХ ПОЛІВ ФОРМИ (Пункт 6 — щоб не залишалися пошта, ім'я та залізо!):
+    nameEl.value = '';
+    hwEl.value = '';
+    emailEl.value = '';
+    textEl.value = '';
+    updEl.checked = false;
+    window.setReviewStars(5);
 
     if (statusMsg) {
         statusMsg.style.color = 'var(--neon-green)';
@@ -4297,7 +4404,9 @@ window.submitUserReview = async function() {
         });
     } catch (e) {}
 
-    document.getElementById('rev-text').value = '';
+    // Автоматичне підвантаження свіжої бази через 20 та 35 секунд (без необхідності натискати Ctrl+F5!):
+    setTimeout(reloadReviewsAndDictFromServer, 20000);
+    setTimeout(reloadReviewsAndDictFromServer, 35000);
 };
 
 window.openDevReplyBuilder = function(idx) {
@@ -4305,7 +4414,7 @@ window.openDevReplyBuilder = function(idx) {
     var allReviews = window._CURRENT_MERGED_REVIEWS || [];
     var target = allReviews[idx];
     if (!target) return;
-    document.getElementById('dev-reply-target-info').textContent = 'Відповідь для: ' + (target.nameUk || target.nameEn) + ' (' + target.hwUk + ')';
+    document.getElementById('dev-reply-target-info').textContent = 'Відповідь для: ' + (target.nameUk || target.nameEn) + ' (' + target.hwUk + ' • ' + (target.email || 'Без пошти') + ')';
     document.getElementById('dev-reply-textarea').value = target.devReplyUk || '';
     window.openModal('dev-reply-modal');
 };
@@ -4332,12 +4441,37 @@ window.applyDevReplyAndCopyJson = function() {
     window.closeModal('dev-reply-modal');
 };
 
-window.notifyReviewerByGmail = function() {
+// ВІДПРАВКА КІБЕРПАНК HTML-ЛИСТА КЛІЄНТУ ЧЕРЕЗ ХМАРНИЙ СЕРВЕР TALOS (Пункт 3 — замість сірого тексту Gmail!):
+window.notifyReviewerByGmail = async function() {
     var allReviews = window._CURRENT_MERGED_REVIEWS || [];
     var target = allReviews[_activeReplyIdx] || {};
+    var replyTxt = (document.getElementById('dev-reply-textarea').value || '').trim();
+    if (!replyTxt) {
+        alert("Спочатку напишіть текст відповіді розробника!");
+        return;
+    }
     var toEmail = (target.email && target.email.indexOf('@') !== -1) ? target.email : '';
-    var subj = encodeURIComponent('TALOS VISION LABS — Оновлення щодо вашого відгуку');
-    var body = encodeURIComponent((document.getElementById('dev-reply-textarea').value || '').trim());
+    if (toEmail) {
+        try {
+            await fetch(getCloudUrl(), {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({
+                    type: 'SEND_DEV_REPLY',
+                    email: toEmail,
+                    nameUk: target.nameUk || target.nameEn || 'Клієнт TALOS',
+                    textUk: target.textUk || '',
+                    devReplyUk: replyTxt,
+                    edition: target.edition || 'PRO'
+                })
+            });
+            alert("✅ Фірмовий кіберпанк HTML-лист успішно надіслано клієнту на адресу: " + toEmail);
+            return;
+        } catch (e) {}
+    }
+    var subj = encodeURIComponent('⚡ TALOS VISION LABS — Офіційна відповідь розробника на ваш відгук');
+    var body = encodeURIComponent(replyTxt);
     var url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(toEmail) + '&su=' + subj + '&body=' + body;
     window.open(url, 'GmailNotify', 'width=680,height=620,Left=200,Top=100');
 };
