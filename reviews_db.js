@@ -45,4 +45,21 @@ window.TALOS_APPROVED_REVIEWS = [
         devReplyEn: "Thank you for the high rating, Andriy! Enjoy your movies on the big screen!",
         devReplyDate: "16.10.2026 20:05"
     }
+,
+    {
+        "nameUk": "Тест 4",
+        "nameEn": "Test 4",
+        "edition": "PRO",
+        "hwUk": "Все ще RTX4070Ti",
+        "hwEn": "Still RTX4070Ti",
+        "stars": 3,
+        "date": "20.10.2026",
+        "updatedBadge": true,
+        "email": "",
+        "textUk": "Все ще в захопленні від всього,але дратує що певні аспекти не працюють.Та не опускаємо рук і продовжуємо працювати щоб довести до ідеала!",
+        "textEn": "Still thrilled with everything, but it's annoying that certain aspects don't work. But we don't give up and keep working to bring it to perfection!",
+        "devReplyUk": "",
+        "devReplyEn": "",
+        "devReplyDate": ""
+}
 ];
