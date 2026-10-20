@@ -3593,7 +3593,10 @@
 
         </p>
 
-        <input type="password" id="admin-pin-input" class="mail-form-field" style="text-align: center; font-size: 1.3rem; letter-spacing: 6px; font-weight: 900;" placeholder="••••" onkeydown="if(event.key==='Enter') verifyCustomPinModal()">
+        <div style="position:relative; margin-bottom:10px;">
+            <input type="password" id="admin-pin-input" class="mail-form-field" style="text-align:center; font-size:1.3rem; letter-spacing:6px; font-weight:900; margin-bottom:0; padding-right:44px;" placeholder="••••" onkeydown="if(event.key==='Enter') verifyCustomPinModal()">
+            <button type="button" onclick="var p=document.getElementById('admin-pin-input'); p.type=(p.type==='password'?'text':'password');" title="Показати / приховати код" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-secondary); font-size:1.15rem; cursor:pointer;">👁️</button>
+        </div>
 
         <div id="pin-err-msg" style="color: var(--neon-bronze); font-size: 0.82rem; margin-bottom: 10px; min-height: 18px;"></div>
 
@@ -3928,6 +3931,10 @@ window.runInstantBrowserHardwareScan = async function() {
         return Math.abs(curr - measuredHz) < Math.abs(prev - measuredHz) ? curr : prev;
     });
 
+    var isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent || '');
+    var mobileNote = isMobileDevice
+        ? '<div style="margin-top:8px; padding:10px; border-radius:8px; background:rgba(255,184,77,0.12); border:1px solid var(--neon-gold); color:var(--neon-gold); font-size:0.86rem;">📱 <b>Увага:</b> Ви запустили тест зі смартфона/планшета. Програмний комплекс <b>TALOS 60FPS</b> встановлюється на комп’ютери та ноутбуки з <b>Windows 10/11</b> — відкрийте цей тест на своєму ПК!</div>'
+        : '';
     var isProGpu = /RTX|GTX 166|GTX 107|GTX 108|RX 66|RX 67|RX 68|RX 69|RX 76|RX 77|RX 78|RX 79|Arc A7/i.test(gpu);
     var isPro = (isProGpu && cores >= 6);
     var verdict = isPro ? 'TALOS 60FPS PRO (RIFE AI v4.6 Vulkan)' : 'TALOS 60FPS LITE (MVTools2 ClangCL AVX2)';
@@ -3939,7 +3946,7 @@ window.runInstantBrowserHardwareScan = async function() {
         '<div><b>🧠 Потоки процесора (CPU Threads):</b> <b>' + cores + '</b></div>' +
         '<div><b>🖥️ Фізична матриця та частота:</b> <b>' + realW + '×' + realH + ' @ ~' + stdHz + ' Hz</b></div>' +
         '<div style="margin-top:8px; padding-top:10px; border-top:1px solid var(--border-glass); font-size:1.05rem;">' +
-        '<b>🏆 Рекомендована версія:</b> <span style="color:' + vColor + '; font-weight:900;">' + verdict + '</span></div>' +
+        '<b>🏆 Рекомендована версія:</b> <span style="color:' + vColor + '; font-weight:900;">' + verdict + '</span></div>' + mobileNote +
         '</div>';
 };
 
@@ -4309,10 +4316,10 @@ window.sendCustomBotMsg = function() {
     inp.value = '';
     var ql = q.toLowerCase();
     var key = 'pro_vs_lite';
-    if (/vlc|potplayer|kmplayer|player|плеєр|плеер/i.test(ql)) key = 'other_players';
-    else if (/tv|hdmi|wi-fi|wifi|телевізор|тв|кабел/i.test(ql)) key = 'tv_hdmi';
-    else if (/del|reinstall|win|key|hwid|видал|перевстанов|ключ|віднов|планшет|tablet/i.test(ql)) key = 'restore_files';
-    else if (/apollo|аполло|озвуч|голос|voice/i.test(ql)) key = 'apollo_eta';
+    if (/vlc|potplayer|kmplayer|player|плеєр|плеер|mpc/i.test(ql)) key = 'other_players';
+    else if (/tv|hdmi|wi-fi|wifi|телевізор|тв|кабел|displayport|miracast/i.test(ql)) key = 'tv_hdmi';
+    else if (/del|reinstall|win|key|hwid|видал|перевстанов|ключ|віднов|планшет|tablet|знижк|50%/i.test(ql)) key = 'restore_files';
+    else if (/apollo|аполло|озвуч|голос|voice|дубляж/i.test(ql)) key = 'apollo_eta';
     window.askBot(key);
 };
 
