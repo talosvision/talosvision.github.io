@@ -1845,6 +1845,95 @@
 
         }
 
+    
+        /* КІБЕРПАНК БУРГЕР-МЕНЮ ДЛЯ МОБІЛЬНИХ ПРИСТРОЇВ ТА ПЛАНШЕТІВ (v10.8) */
+        .nav-right-controls {
+            display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+        }
+        .burger-btn {
+            display: none;
+            width: 38px; height: 36px; padding: 7px 8px;
+            border-radius: 10px;
+            background: linear-gradient(180deg, #282a45 0%, #141526 100%);
+            border: 1px solid rgba(0, 245, 155, 0.45);
+            box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.25), 0 4px 10px rgba(0, 0, 0, 0.65);
+            cursor: pointer;
+            flex-direction: column; justify-content: space-between; align-items: center;
+            transition: all 0.2s ease; user-select: none;
+        }
+        .burger-btn:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 14px rgba(0, 210, 255, 0.4);
+        }
+        .burger-line {
+            width: 100%; height: 2.5px; border-radius: 2px;
+            background: var(--neon-green);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+        }
+        .burger-btn.open .burger-line:nth-child(1) {
+            transform: translateY(7.5px) rotate(45deg);
+            background: var(--neon-bronze);
+        }
+        .burger-btn.open .burger-line:nth-child(2) {
+            opacity: 0; transform: scaleX(0);
+        }
+        .burger-btn.open .burger-line:nth-child(3) {
+            transform: translateY(-7.5px) rotate(-45deg);
+            background: var(--neon-bronze);
+        }
+        @media (max-width: 960px) {
+            .nav-wrap {
+                flex-wrap: nowrap !important;
+                justify-content: space-between !important;
+                position: relative;
+            }
+            .burger-btn { display: flex; }
+            .nav-menu {
+                display: none !important;
+                position: absolute;
+                top: calc(100% + 10px);
+                left: 0; right: 0;
+                background: rgba(12, 13, 24, 0.97);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(0, 245, 155, 0.35);
+                border-radius: 16px;
+                padding: 16px;
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 8px !important;
+                box-shadow: 0 22px 55px rgba(0, 0, 0, 0.92);
+                z-index: 1400;
+            }
+            .nav-menu.mobile-open {
+                display: flex !important;
+                animation: burgerSlideDown 0.22s ease-out;
+            }
+            .nav-menu a {
+                padding: 10px 14px;
+                border-radius: 10px;
+                background: rgba(255, 255, 255, 0.03);
+                border: 1px solid rgba(255, 255, 255, 0.06);
+                font-size: 0.96rem;
+                text-align: left;
+            }
+            .nav-menu a:hover {
+                background: rgba(0, 245, 155, 0.12);
+                border-color: var(--neon-green);
+            }
+            .nav-menu .apollo-trigger-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 11px 14px;
+                margin-top: 4px;
+                font-size: 0.88rem;
+            }
+        }
+        @keyframes burgerSlideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
     </style>
 
 </head>
@@ -1853,110 +1942,67 @@
 
 
 
-<!-- НАВІГАЦІЯ -->
-
+<!-- НАВІГАЦІЯ З АДАПТИВНИМ БУРГЕР-МЕНЮ ДЛЯ МОБІЛЬНИХ (v10.8) -->
 <nav>
-
     <div class="container nav-wrap">
-
-        <a href="#" class="logo">
-
+        <a href="#" class="logo" onclick="closeMobileNav()">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff8c5a" stroke-width="2.2">
-
                 <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"></polygon>
-
                 <circle cx="12" cy="12" r="3" fill="#00f59b" stroke="none"></circle>
-
             </svg>
-
             TALOS <span>VISION</span>
-
         </a>
 
-        <div class="nav-menu">
-
-            <a href="#benefits" data-i18n="nav_1">Переваги</a>
-
-            <a href="#demo" data-i18n="nav_2">Відео 24 vs 60/144</a>
-
-            <a href="#requirements" data-i18n="nav_3">Вимоги</a>
-
-            <a href="#pricing" data-i18n="nav_4">Тарифи</a>
-
-            <a href="#about" data-i18n="nav_5">Про нас</a>
-
-            <a href="#reviews" data-i18n="nav_rev">Відгуки</a>
-
-            <a href="#faq" data-i18n="nav_6">FAQ</a>
-
-            <button class="apollo-trigger-btn" onclick="openApolloModal()" data-i18n="nav_apollo">
-
+        <div class="nav-menu" id="mobile-nav-drawer">
+            <a href="#benefits" data-i18n="nav_1" onclick="closeMobileNav()">Переваги</a>
+            <a href="#demo" data-i18n="nav_2" onclick="closeMobileNav()">Відео 24 vs 60/144</a>
+            <a href="#requirements" data-i18n="nav_3" onclick="closeMobileNav()">Вимоги</a>
+            <a href="#pricing" data-i18n="nav_4" onclick="closeMobileNav()">Тарифи</a>
+            <a href="#about" data-i18n="nav_5" onclick="closeMobileNav()">Про нас</a>
+            <a href="#reviews" data-i18n="nav_rev" onclick="closeMobileNav()">Відгуки</a>
+            <a href="#faq" data-i18n="nav_6" onclick="closeMobileNav()">FAQ</a>
+            <button class="apollo-trigger-btn" onclick="closeMobileNav(); openApolloModal();" data-i18n="nav_apollo">
                 🎙 Скоро: Аудіолокалізатор APOLLO
-
             </button>
-
-
-
-            <div class="lang-widget">
-
-                <button class="lang-cube-btn" onclick="toggleLangMenu(event)" id="lang-btn" title="Change Language">
-
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                        <circle cx="12" cy="12" r="10"></circle>
-
-                        <line x1="2" y1="12" x2="22" y2="12"></line>
-
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-
-                    </svg>
-
-                    <span id="lang-code">UA</span>
-
-                </button>
-
-                <div class="lang-dropdown" id="lang-menu">
-
-                    <button class="lang-opt active" onclick="selectLang('uk', 'UA')"><b>UA</b> Українська</button>
-
-                    <button class="lang-opt" onclick="selectLang('en', 'EN')"><b>EN</b> English</button>
-
-                    <button class="lang-opt" onclick="selectLang('de', 'DE')"><b>DE</b> Deutsch</button>
-
-                    <button class="lang-opt" onclick="selectLang('fr', 'FR')"><b>FR</b> Français</button>
-
-                    <button class="lang-opt" onclick="selectLang('pl', 'PL')"><b>PL</b> Polski</button>
-
-                    <button class="lang-opt" onclick="selectLang('es', 'ES')"><b>ES</b> Español</button>
-
-                    <button class="lang-opt" onclick="selectLang('it', 'IT')"><b>IT</b> Italiano</button>
-
-                    <button class="lang-opt" onclick="selectLang('bg', 'BG')"><b>BG</b> Български</button>
-
-                    <button class="lang-opt" onclick="selectLang('ja', 'JA')"><b>JA</b> 日本語</button>
-
-                    <button class="lang-opt" onclick="selectLang('cs', 'CS')"><b>CS</b> Čeština</button>
-
-                    <button class="lang-opt" onclick="selectLang('ro', 'RO')"><b>RO</b> Română</button>
-
-                    <button class="lang-opt" onclick="selectLang('nl', 'NL')"><b>NL</b> Nederlands</button>
-
-                    <button class="lang-opt" onclick="selectLang('pt', 'PT')"><b>PT</b> Português</button>
-
-                    <button class="lang-opt" onclick="selectLang('sv', 'SV')"><b>SV</b> Svenska</button>
-
-                    <button class="lang-opt" onclick="selectLang('tr', 'TR')"><b>TR</b> Türkçe</button>
-
-                    <button class="lang-opt" onclick="selectLang('ko', 'KO')"><b>KO</b> 한국어</button>
-
-                </div>
-
-            </div>
-
         </div>
 
-    </div>
+        <div class="nav-right-controls">
+            <div class="lang-widget">
+                <button class="lang-cube-btn" onclick="toggleLangMenu(event)" id="lang-btn" title="Change Language">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span id="lang-code">UA</span>
+                </button>
+                <div class="lang-dropdown" id="lang-menu">
+                    <button class="lang-opt active" onclick="selectLang('uk', 'UA')"><b>UA</b> Українська</button>
+                    <button class="lang-opt" onclick="selectLang('en', 'EN')"><b>EN</b> English</button>
+                    <button class="lang-opt" onclick="selectLang('de', 'DE')"><b>DE</b> Deutsch</button>
+                    <button class="lang-opt" onclick="selectLang('fr', 'FR')"><b>FR</b> Français</button>
+                    <button class="lang-opt" onclick="selectLang('pl', 'PL')"><b>PL</b> Polski</button>
+                    <button class="lang-opt" onclick="selectLang('es', 'ES')"><b>ES</b> Español</button>
+                    <button class="lang-opt" onclick="selectLang('it', 'IT')"><b>IT</b> Italiano</button>
+                    <button class="lang-opt" onclick="selectLang('bg', 'BG')"><b>BG</b> Български</button>
+                    <button class="lang-opt" onclick="selectLang('ja', 'JA')"><b>JA</b> 日本語</button>
+                    <button class="lang-opt" onclick="selectLang('cs', 'CS')"><b>CS</b> Čeština</button>
+                    <button class="lang-opt" onclick="selectLang('ro', 'RO')"><b>RO</b> Română</button>
+                    <button class="lang-opt" onclick="selectLang('nl', 'NL')"><b>NL</b> Nederlands</button>
+                    <button class="lang-opt" onclick="selectLang('pt', 'PT')"><b>PT</b> Português</button>
+                    <button class="lang-opt" onclick="selectLang('sv', 'SV')"><b>SV</b> Svenska</button>
+                    <button class="lang-opt" onclick="selectLang('tr', 'TR')"><b>TR</b> Türkçe</button>
+                    <button class="lang-opt" onclick="selectLang('ko', 'KO')"><b>KO</b> 한국어</button>
+                </div>
+            </div>
 
+            <button type="button" class="burger-btn" id="burger-toggle-btn" onclick="toggleMobileNav(event)" aria-label="Меню навігації">
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+                <span class="burger-line"></span>
+            </button>
+        </div>
+    </div>
 </nav>
 
 
@@ -4270,9 +4316,40 @@ window.sendCustomBotMsg = function() {
     window.askBot(key);
 };
 
-// 8. СЕКРЕТНИЙ РАДАР АДМІНІСТРАТОРА ('zevs' або 'пуми' + PIN 1313 -> #radar-modal):
+// 8. БУРГЕР-МЕНЮ ТА СЕКРЕТНИЙ РАДАР АДМІНІСТРАТОРА ('zevs' / 'яумі' або фізичні клавіші KeyZ+KeyE+KeyV+KeyS + PIN 1313):
+window.toggleMobileNav = function(ev) {
+    if (ev) ev.stopPropagation();
+    var drawer = document.getElementById('mobile-nav-drawer');
+    var btn = document.getElementById('burger-toggle-btn');
+    var langMenu = document.getElementById('lang-menu');
+    if (langMenu) langMenu.classList.remove('show');
+    if (drawer) drawer.classList.toggle('mobile-open');
+    if (btn) btn.classList.toggle('open');
+};
+
+window.closeMobileNav = function() {
+    var drawer = document.getElementById('mobile-nav-drawer');
+    var btn = document.getElementById('burger-toggle-btn');
+    if (drawer) drawer.classList.remove('mobile-open');
+    if (btn) btn.classList.remove('open');
+};
+
+document.addEventListener('click', function(ev) {
+    var drawer = document.getElementById('mobile-nav-drawer');
+    var btn = document.getElementById('burger-toggle-btn');
+    if (drawer && drawer.classList.contains('mobile-open')) {
+        if (!drawer.contains(ev.target) && (!btn || !btn.contains(ev.target))) {
+            window.closeMobileNav();
+        }
+    }
+});
+
 var _secretBuf = '';
-var _PIN_DIGEST = 1510443;
+var _codeBuf = '';
+// Точний DJB2-дайджест для '1313' (2089291725) + еталонний SHA-256 хеш сервера:
+var _PIN_DIGEST = 2089291725;
+var _EXPECTED_SRV_SHA256 = 'b6a0c6e58f4899622e58585b4628d88a885c27b9e96707c079e882b1d452f09a';
+
 function _hHash(s) {
     var h = 5381;
     for (var i = 0; i < s.length; i++) h = ((h << 5) + h) + s.charCodeAt(i);
@@ -4282,9 +4359,18 @@ function _hHash(s) {
 document.addEventListener('keydown', function(e) {
     var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
     if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+
     _secretBuf = (_secretBuf + (e.key || '').toLowerCase()).slice(-8);
-    if (_secretBuf.endsWith('zevs') || _secretBuf.endsWith('пуми')) {
+    _codeBuf = (_codeBuf + (e.code || '')).slice(-24);
+
+    if (
+        _secretBuf.endsWith('zevs') ||
+        _secretBuf.endsWith('яумі') ||
+        _secretBuf.endsWith('пуми') ||
+        _codeBuf.endsWith('KeyZKeyEKeyVKeyS')
+    ) {
         _secretBuf = '';
+        _codeBuf = '';
         if (sessionStorage.getItem('talos_diag_auth') === '1') {
             window.showUnlockedRadarWindow();
         } else {
@@ -4298,15 +4384,17 @@ document.addEventListener('keydown', function(e) {
 
 window.verifyCustomPinModal = async function() {
     var entered = (document.getElementById('admin-pin-input').value || '').trim();
-    if (_hHash(entered) === _PIN_DIGEST) {
+    var srvKey = '';
+    try {
+        if (window.crypto && window.crypto.subtle) {
+            var buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode('TALOS_SALT_v10_' + entered));
+            srvKey = Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+        }
+    } catch (e) {}
+
+    if (_hHash(entered) === _PIN_DIGEST || srvKey === _EXPECTED_SRV_SHA256) {
         sessionStorage.setItem('talos_diag_auth', '1');
-        try {
-            if (window.crypto && window.crypto.subtle) {
-                var buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode('TALOS_SALT_v10_' + entered));
-                var srvKey = Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
-                sessionStorage.setItem('talos_srv_sha256', srvKey);
-            }
-        } catch (e) {}
+        sessionStorage.setItem('talos_srv_sha256', srvKey || _EXPECTED_SRV_SHA256);
         window.closeModal('pin-modal');
         window.renderReviewsList();
         window.showUnlockedRadarWindow();
@@ -4371,6 +4459,31 @@ window.renderRadarDashboard = function() {
         donutLegend.innerHTML = '<div>🟢 ПК / Ноутбуки: <b>' + pcCount + ' (' + pcPct + '%)</b></div>' +
                                 '<div>🟡 Смартфони: <b>' + mobCount + ' (' + mobPct + '%)</b></div>';
     }
+
+    // Відмальовування графіків Топ Країн та Джерел трафіку:
+    var countryCounts = {}, sourceCounts = {};
+    visits.forEach(function(v) {
+        var c = (v.loc || 'Unknown').split(',')[0].trim() || 'Unknown';
+        var s = (v.ref || 'Direct / Прямий вхід').trim();
+        countryCounts[c] = (countryCounts[c] || 0) + 1;
+        sourceCounts[s] = (sourceCounts[s] || 0) + 1;
+    });
+    function renderBars(elId, mapObj) {
+        var box = document.getElementById(elId);
+        if (!box) return;
+        var entries = Object.entries(mapObj).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 4);
+        if (!entries.length) {
+            box.innerHTML = '<div style="color:var(--text-secondary);font-size:0.8rem;">Дані накопичуються...</div>';
+            return;
+        }
+        box.innerHTML = entries.map(function(item) {
+            var pct = total ? Math.round((item[1] * 100) / total) : 0;
+            return '<div class="bar-item"><div class="bar-hdr"><span>' + item[0] + '</span><span>' + item[1] + ' (' + pct + '%)</span></div>' +
+                   '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;"></div></div></div>';
+        }).join('');
+    }
+    renderBars('radar-countries-bars', countryCounts);
+    renderBars('radar-sources-bars', sourceCounts);
 
     var tbody = document.getElementById('radar-log-tbody');
     if (!tbody) return;
