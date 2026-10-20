@@ -73,4 +73,18 @@ window.TALOS_APPROVED_REVIEWS = [
         "date": "21.10.2026",
         "email": "talosvision.labs@gmail.com"
 }
+,
+    {
+        "nameUk": "Тест майже впевнений що передостанній",
+        "nameEn": "Тест майже впевнений що передостанній",
+        "edition": "PRO",
+        "hwUk": "Все так само",
+        "hwEn": "Все так само",
+        "stars": 5,
+        "updatedBadge": false,
+        "textUk": "Майже готово.Шліфуємо і доробляємо.",
+        "textEn": "Майже готово.Шліфуємо і доробляємо.",
+        "date": "21.10.2026",
+        "email": "talosvision.labs@gmail.com"
+}
 ];
