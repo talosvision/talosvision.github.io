@@ -45,21 +45,4 @@ window.TALOS_APPROVED_REVIEWS = [
         devReplyEn: "Thank you for the high rating, Andriy! Enjoy your movies on the big screen!",
         devReplyDate: "16.10.2026 20:05"
     }
-,
-    {
-        "nameUk": "Тест 5",
-        "nameEn": "Тест 5",
-        "edition": "PRO",
-        "hwUk": "Вже не важливо 4070",
-        "hwEn": "Вже не важливо 4070",
-        "stars": 5,
-        "date": "20.10.2026",
-        "updatedBadge": false,
-        "email": "",
-        "textUk": "Знову якийсь збій в перекладі,але доб#39;ємо.Все буде добре.",
-        "textEn": "Знову якийсь збій в перекладі,але доб#39;ємо.Все буде добре.",
-        "devReplyUk": "",
-        "devReplyEn": "",
-        "devReplyDate": ""
-}
 ];

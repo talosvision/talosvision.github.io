@@ -3601,3263 +3601,753 @@
 <!-- СКРИПТИ КЕРУВАННЯ -->
 
 <!-- === START_MAIN_SCRIPT === -->
-
 <script>
+// ============================================================================
+// 🚀 TALOS VISION v10.6 — ЄДИНИЙ ЧИСТИЙ ДВИГУН САЙТУ (16 МОВ, 0% GOOGLE TRANSLATE)
+// Українська ('uk') — єдина головна мова; усі 15 іноземних мов (включно з 'en') рівноправні!
+// ============================================================================
 
-    let currentLang = 'uk';
+// Автоматичне очищення старого кешу тестових коментарів у браузері (Тест 2, Тест 3, Тест 5):
+try {
+    localStorage.removeItem('talos_rev_cache_v82');
+    localStorage.removeItem('talos_gtx_i18n_v4');
+} catch (e) {}
 
-    let currentHz = 60;
+let currentLang = 'uk';
+let currentHz = 60;
+let currentDemoMode = 60;
+let currentCatIdx = 0;
+let currentVidIdx = 0;
+let currentStars = 5;
+let _activeReplyIdx = -1;
+const LOCAL_REV_KEY = 'talos_rev_cache_v106';
+const CLOUD_CONTROLLER_URL = "https://script.google.com/macros/s/AKfycbx8w_M37U164b9j-aB69j-R-n7vB-G1_o1s2w_v/exec";
 
-    let currentEggTier = 'gold';
+// Словник оригінальних українських текстів з DOM при старті сторінки:
+const UK_ORIG = {};
+const UK_PLACEHOLDERS = {};
 
-    let lastBotTopic = null;
-
-    const eggCounters = { bronze: 0, silver: 0, gold: 0 };
-
-
-
-    // Криптографічний хеш-детектор (приховує PIN та сервісну команду від перегляду через F12 / Ctrl+U)
-
-    function _hHash(s) {
-
-        let h = 2166136261 >>> 0;
-
-        for (let i = 0; i < s.length; i++) {
-
-            h ^= s.charCodeAt(i);
-
-            h = Math.imul(h, 16777619) >>> 0;
-
-        }
-
-        return h.toString(16);
-
+window.tSlot = function(slotKey, lang) {
+    var lg = lang || currentLang || 'uk';
+    var tbl = window.TALOS_I18N_TABLE;
+    if (tbl && tbl[slotKey]) {
+        return tbl[slotKey][lg] || tbl[slotKey]['uk'] || '';
     }
-
-        // Захист від вставки шкідливого коду / XSS у поля коментарів
-
-    function escapeHtmlSanitizer(str) {
-
-        if (!str) return "";
-
-        return String(str)
-
-            .replace(/<[^>]*>?/gm, "")
-
-            .replace(/[<>&"'`]/g, function(ch) {
-
-                return ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;', '`': '&#96;' })[ch];
-
-            });
-
-    }
-
-    const _PIN_DIGEST = "5b5b5535";
-
-    const _CMD_DIGEST_1 = "ecfb68a6";
-
-    const _CMD_DIGEST_2 = "3f1bf10d";
-
-    const _SEQ_DIGEST = "15fa7cad";
-
-
-
-        // =========================================================================
-
-    // ДВОРІВНЕВА STEAM-ВІТРИНА v8.5 (МИТТЄВЕ ПЕРЕМИКАННЯ БЕЗ ЗАВИСАНЬ І ЧОРНИХ ЕКРАНІВ)
-
-    // =========================================================================
-
-    let activePlaylistMode = '60';
-
-    let activeCategoryIdx = 0;
-
-    let activeVideoIdx = 0;
-
-    let currentPlaylistLength = 1;
-
-
-
-    function getShowcaseCategories() {
-
-        const cfg = window.TALOS_CONFIG || {};
-
-        return cfg.showcaseCategories || [];
-
-    }
-
-
-
-    function extractPlaylistId(url) {
-
-        if (!url) return null;
-
-        const m = url.match(/[?&]list=([a-zA-Z0-9_-]+)/);
-
-        return m ? m[1] : null;
-
-    }
-
-
-
-    function renderDynamicDashes(totalVideos, currentIndex, isPro144) {
-
-        const count = Math.max(1, totalVideos || 1);
-
-        currentPlaylistLength = count;
-
-        const isUk = (currentLang === 'uk');
-
-
-
-        const counterEl = document.getElementById('steam-slide-counter');
-
-        if (counterEl) {
-
-            counterEl.textContent = (isUk ? 'Відео ' : 'Video ') + `${currentIndex + 1} / ${count}`;
-
-        }
-
-
-
-        const dotsBox = document.getElementById('steam-dots-box');
-
-        if (!dotsBox) return;
-
-        dotsBox.innerHTML = '';
-
-
-
-        for (let i = 0; i < count; i++) {
-
-            const dash = document.createElement('button');
-
-            const activeDashClass = isPro144 ? ' active-pro' : ' active-lite';
-
-            dash.className = 'steam-dash' + (i === currentIndex ? activeDashClass : '');
-
-            dash.title = (isUk ? 'Відео №' : 'Video #') + (i + 1);
-
-            dash.onclick = () => {
-
-                activeVideoIdx = i;
-
-                renderSteamCarousel();
-
-            };
-
-            dotsBox.appendChild(dash);
-
-        }
-
-    }
-
-
-
-    function renderSteamCarousel() {
-
-        const cats = getShowcaseCategories();
-
-        if (!cats.length) return;
-
-        if (activeCategoryIdx >= cats.length) activeCategoryIdx = 0;
-
-        if (activeCategoryIdx < 0) activeCategoryIdx = cats.length - 1;
-
-
-
-        const isPro144 = (activePlaylistMode === '144');
-
-        const isUk = (currentLang === 'uk');
-
-        const cfg = window.TALOS_CONFIG || {};
-
-        const currentCat = cats[activeCategoryIdx];
-
-
-
-        const modeTag = document.getElementById('steam-mode-tag');
-
-        const boxBorder = document.getElementById('steam-box-border');
-
-        if (modeTag) {
-
-            modeTag.style.color = isPro144 ? 'var(--neon-green)' : 'var(--neon-gold)';
-
-            modeTag.textContent = isPro144 ? 'PRO: 24 vs 144 FPS' : 'LITE: 24 vs 60 FPS';
-
-        }
-
-        if (boxBorder) {
-
-            boxBorder.style.borderColor = isPro144 ? 'rgba(0, 245, 155, 0.38)' : 'rgba(255, 184, 77, 0.38)';
-
-        }
-
-
-
-        // 1. Будуємо 4 кнопки категорій праворуч
-
-        const btnList = document.getElementById('steam-scene-buttons');
-
-        if (btnList) {
-
-            btnList.innerHTML = '';
-
-            cats.forEach((cat, cIdx) => {
-
-                const rawTitle = isUk ? (cat.catTitleUk || cat.catTitleEn) : (cat.catTitleEn || cat.catTitleUk);
-
-                const cleanTitle = rawTitle.replace(/^\d+\.\s*/, '');
-
-                const sText = isPro144
-
-                    ? (isUk ? (cat.catSub144Uk || cat.catSub144En) : (cat.catSub144En || cat.catSub144Uk))
-
-                    : (isUk ? (cat.catSub60Uk || cat.catSub60En) : (cat.catSub60En || cat.catSub60Uk));
-
-
-
-                const btn = document.createElement('button');
-
-                const pillClass = isPro144 ? 'scene-pill-pro' : 'scene-pill-lite';
-
-                btn.className = `scene-pill-btn ${pillClass}` + (cIdx === activeCategoryIdx ? ' active' : '');
-
-                btn.innerHTML = `<span class="scene-pill-title">${cleanTitle}</span><span class="scene-pill-sub">${sText}</span>`;
-
-                btn.onclick = () => {
-
-                    activeCategoryIdx = cIdx;
-
-                    activeVideoIdx = 0;
-
-                    renderSteamCarousel();
-
-                };
-
-                btnList.appendChild(btn);
-
-            });
-
-        }
-
-
-
-        // 2. Оновлюємо кнопку YouTube-каналу
-
-        const playlistHref = (isPro144 ? currentCat.playlist144Url : currentCat.playlist60Url) || cfg.youtubeChannelUrl || 'https://www.youtube.com/@TalosVisionLabs';
-
-        const barYt = document.getElementById('bar-yt-link');
-
-        const fbYt = document.getElementById('fallback-yt-link');
-
-        if (barYt) barYt.href = playlistHref;
-
-        if (fbYt) fbYt.href = playlistHref;
-
-
-
-        const ytCount = isPro144 ? (currentCat.count144 || 0) : (currentCat.count60 || 0);
-
-        const fallbackMp4 = isPro144 ? (currentCat.fallbackMp4_144 || '') : (currentCat.fallbackMp4_60 || '');
-
-        const plId = extractPlaylistId(playlistHref);
-
-        const catTitleClean = (isUk ? currentCat.catTitleUk : currentCat.catTitleEn).replace(/^\d+\.\s*/, '');
-
-
-
-        const videoEl = document.getElementById('demo-player');
-
-        const ytIframe = document.getElementById('yt-iframe');
-
-        const fallbackBox = document.getElementById('vid-slot-fallback');
-
-
-
-        // Якщо відкрито на живому сайті і в плейлисті YouTube є відео (ytCount > 0) -> вмикаємо чистий YouTube IFrame!
-
-        if (window.location.protocol !== 'file:' && plId && ytCount > 0) {
-
-            if (activeVideoIdx >= ytCount) activeVideoIdx = 0;
-
-            renderDynamicDashes(ytCount, activeVideoIdx, isPro144);
-
-            videoEl.pause();
-
-            videoEl.style.display = 'none';
-
-            fallbackBox.style.display = 'none';
-
-            ytIframe.style.display = 'block';
-
-            const targetSrc = `https://www.youtube.com/embed/videoseries?list=${encodeURIComponent(plId)}&index=${activeVideoIdx}&rel=0&hl=${currentLang}`;
-
-            if (ytIframe.src !== targetSrc) {
-
-                ytIframe.src = targetSrc;
-
-            }
-
-        }
-
-        // Якщо відкрито локально з диска (file:///) або є локальний .mp4 файл (напр. 24x60FPS1.mp4) -> крутимо рідний плеєр!
-
-        else if (fallbackMp4 && fallbackMp4.trim()) {
-
-            renderDynamicDashes(1, 0, isPro144);
-
-            ytIframe.src = 'about:blank';
-
-            ytIframe.style.display = 'none';
-
-            fallbackBox.style.display = 'none';
-
-            videoEl.style.display = 'block';
-
-            videoEl.onerror = function() {
-
-                videoEl.style.display = 'none';
-
-                fallbackBox.style.display = 'flex';
-
-                const fbTitle = document.getElementById('fallback-title');
-
-                if (fbTitle) fbTitle.textContent = catTitleClean;
-
-            };
-
-            videoEl.onloadeddata = function() {
-
-                fallbackBox.style.display = 'none';
-
-                videoEl.style.display = 'block';
-
-            };
-
-            if (!videoEl.src.endsWith(fallbackMp4.trim())) {
-
-                videoEl.src = fallbackMp4.trim();
-
-            }
-
-            videoEl.play().catch(()=>{});
-
-        }
-
-        // Якщо у цьому плейлисті на YouTube поки що 0 відео і немає локального MP4 -> миттєво показуємо красиву заставку замість чорного екрана!
-
-        else {
-
-            renderDynamicDashes(1, 0, isPro144);
-
-            videoEl.pause();
-
-            videoEl.style.display = 'none';
-
-            ytIframe.src = 'about:blank';
-
-            ytIframe.style.display = 'none';
-
-            fallbackBox.style.display = 'flex';
-
-            const fbTitle = document.getElementById('fallback-title');
-
-            if (fbTitle) fbTitle.textContent = "🎬 " + catTitleClean;
-
-        }
-
-    }
-
-
-
-    function switchPlaylistMode(mode) {
-
-        activePlaylistMode = mode;
-
-        activeVideoIdx = 0;
-
-        document.getElementById('btn-vid-60').classList.toggle('active-vid', mode === '60');
-
-        document.getElementById('btn-vid-144').classList.toggle('active-vid', mode === '144');
-
-        renderSteamCarousel();
-
-    }
-
-
-
-    function stepSlide(delta) {
-
-        const cats = getShowcaseCategories();
-
-        if (!cats.length) return;
-
-        const currentCat = cats[activeCategoryIdx];
-
-        const isPro144 = (activePlaylistMode === '144');
-
-        const ytCount = isPro144 ? (currentCat.count144 || 0) : (currentCat.count60 || 0);
-
-
-
-        if (ytCount > 1) {
-
-            activeVideoIdx = (activeVideoIdx + delta + ytCount) % ytCount;
-
-            renderSteamCarousel();
-
-        } else {
-
-            activeCategoryIdx = (activeCategoryIdx + delta + cats.length) % cats.length;
-
-            activeVideoIdx = 0;
-
-            renderSteamCarousel();
-
-        }
-
-    }
-
-
-
-
-
-    // =========================================================================
-
-    // ОНЛАЙН-СКАНЕР СУМІСНОСТІ ПК (З ПЕРЕВІРКОЮ ОС ТА ПРАВИЛОМ 1 ЛІЦЕНЗІЯ = 1 ПРИСТРІЙ)
-
-    // =========================================================================
-
-    function measureScreenRefreshRate() {
-
-        return new Promise((resolve) => {
-
-            let frames = 0;
-
-            let start = performance.now();
-
-            function tick(now) {
-
-                frames++;
-
-                if (now - start < 350) {
-
-                    requestAnimationFrame(tick);
-
-                } else {
-
-                    const rawHz = Math.round((frames * 1000) / (now - start));
-
-                    const std = [60, 75, 90, 100, 120, 144, 165, 180, 240];
-
-                    let closest = rawHz;
-
-                    for (let s of std) {
-
-                        if (Math.abs(rawHz - s) <= 6) { closest = s; break; }
-
-                    }
-
-                    resolve(closest);
-
-                }
-
-            }
-
-            requestAnimationFrame(tick);
-
-        });
-
-    }
-
-
-
-    async function runInstantBrowserHardwareScan() {
-
-        const box = document.getElementById('web-scan-result');
-
-        box.style.display = 'block';
-
-        box.innerHTML = `<p style="color: var(--neon-blue); font-weight: 700;">⏳ Перевірка операційної системи, типу пристрою, частоти екрана та відеокарти (0.3 сек)...</p>`;
-
-
-
-        const ua = navigator.userAgent || "";
-
-        const isAndroid = /Android/i.test(ua);
-
-        const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
-        const isMac = /Macintosh|Mac OS X/i.test(ua) && !isIOS;
-
-        const isLinux = /Linux/i.test(ua) && !isAndroid;
-
-        const isWindows = /Windows/i.test(ua);
-
-        const isTouchTabletPC = isWindows && (navigator.maxTouchPoints > 1);
-
-
-
-        let gpuModel = "Стандартний графічний прискорювач";
-
-        try {
-
-            const canvas = document.createElement('canvas');
-
-            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-
-            if (gl) {
-
-                const dbg = gl.getExtension('WEBGL_debug_renderer_info');
-
-                if (dbg) gpuModel = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
-
-            }
-
-        } catch(e) {}
-
-
-
-        let cleanGpu = gpuModel.replace(/^ANGLE\s*\([^,]+,\s*/i, '').replace(/\s*\(0x[0-9a-fA-F]+\).*$/, '').replace(/\s*Direct3D.*$/i, '').replace(/\)$/, '').trim();
-
-        if (!cleanGpu) cleanGpu = gpuModel;
-
-
-
-        const threads = navigator.hardwareConcurrency || 4;
-
-        const dpr = window.devicePixelRatio || 1;
-
-        let physW = Math.round(window.screen.width * dpr);
-
-        let physH = Math.round(window.screen.height * dpr);
-
-        const stdRes = [[3840, 2160, "4K UltraHD"], [2560, 1440, "2K QHD"], [1920, 1080, "Full HD 1080p"], [1366, 768, "HD"]];
-
-        let resTag = "";
-
-        for (let [sw, sh, tag] of stdRes) {
-
-            if (Math.abs(physW - sw) <= 25 && Math.abs(physH - sh) <= 25) {
-
-                physW = sw; physH = sh; resTag = ` (${tag})`; break;
-
-            }
-
-        }
-
-        let resLabel = `${physW}×${physH}${resTag}`;
-
-        const detectedHz = await measureScreenRefreshRate();
-
-
-
-        let reportHtml = "";
-
-
-
-        if (isAndroid || isIOS) {
-
-            const mobOsName = isIOS ? "Apple iOS / iPadOS (iPhone / iPad)" : "Google Android (Смартфон / Планшет)";
-
-            box.style.borderColor = "#ff4d6d";
-
-            reportHtml = `
-
-                <h3 style="color: #ff4d6d; margin-bottom: 10px;">❌ ПРИСТРІЙ НЕСУМІСНИЙ: Ви зайшли з мобільного пристрою (${mobOsName})</h3>
-
-                <p style="color: var(--text-primary); font-size: 0.94rem; line-height: 1.65;">
-
-                    • <b>Виявлена система:</b> <span style="color: var(--neon-gold); font-weight: 700;">${mobOsName}</span> (Графічний чип: ${cleanGpu})<br>
-
-                    • <b>Чому програма не підійде для цього пристрою:</b> Комплекс <b>TALOS 60FPS</b> побудований на базі десктопної архітектури <b>Windows DirectShow</b> та програвача <b>MPC-HC (x86/x64)</b>. На смартфони та Android/iPad-планшети програма фізично не встановлюється.<br>
-
-                    • <b>Що робити:</b> Відкрийте цей сайт на своєму <b>ПК або ноутбуці з Windows 10/11</b> для точної перевірки відеокарти!
-
-                </p>`;
-
-        }
-
-        else if (isMac || isLinux) {
-
-            const deskOsName = isMac ? "Apple macOS (MacBook / iMac)" : "Linux / ChromeOS";
-
-            box.style.borderColor = "#ff4d6d";
-
-            reportHtml = `
-
-                <h3 style="color: #ff4d6d; margin-bottom: 10px;">❌ ОПЕРАЦІЙНА СИСТЕМА НЕСУМІСНА: Виявлено ${deskOsName}</h3>
-
-                <p style="color: var(--text-primary); font-size: 0.94rem; line-height: 1.65;">
-
-                    • <b>Виявлена система:</b> <span style="color: var(--neon-gold); font-weight: 700;">${deskOsName}</span> (GPU: ${cleanGpu})<br>
-
-                    • <b>Причина несумісності:</b> Комплекс <b>TALOS 60FPS</b> використовує системний реєстр Windows, фільтри <b>DirectShow</b> та програвач <b>MPC-HC</b>, які працюють виключно в <b>Microsoft Windows 10/11</b>.
-
-                </p>`;
-
-        }
-
-        else {
-
-            const isPro = /RTX|RX\s*6|RX\s*7|RX\s*8|Radeon\s*PRO/i.test(gpuModel) && threads >= 8;
-
-            const hwidRuleNote = `<br>• <b>Правило ліцензування (1 Пристрій = 1 HWID):</b> Кожна ліцензія прив'язується до заліза одного конкретного пристрою. Для власників повної ПК-версії (100%) діє спеціальний бонус: <b>знижка -50% на додаткову ліцензію LITE виключно для вашого особистого Windows-планшета!</b>`;
-
-            const tabletNote = isTouchTabletPC
-
-                ? (isPro
-
-                    ? `<br>• <b>Сенсорний преміум-ноутбук (Windows Touch):</b> Виявлено високопродуктивний ноутбук із сенсорним дисплеєм та дискретною графікою — підтримується максимальна версія <b>TALOS PRO</b>!`
-
-                    : `<br>• <b>Сенсорний пристрій Windows (Трансформер / Планшет):</b> Зверніть увагу, що ліцензія прив'язується до заліза 1 пристрою (HWID). Для власників ПК-версії також готується спеціальна планшетна редакція <b>TALOS 60FPS Portable</b> зі знижкою <b>-50%</b>!`)
-
-                : ``;
-
-
-
-            if (isPro) {
-
-                box.style.borderColor = "var(--neon-green)";
-
-                reportHtml = `
-
-                    <h3 style="color: var(--neon-green); margin-bottom: 10px;">✅ ВЕРДИКТ ОНЛАЙН-СКАНЕРА: Ваша система Windows ПОВНІСТЮ ПІДТРИМУЄ версію TALOS PRO!</h3>
-
-                    <p style="color: var(--text-primary); font-size: 0.94rem; line-height: 1.65;">
-
-                        • <b>Операційна система:</b> <b>Windows 10/11 (x64 Сумісна)</b><br>
-
-                        • <b>Виявлена відеокарта (GPU):</b> <span style="color: var(--neon-blue); font-weight: 700;">${cleanGpu}</span><br>
-
-                        • <b>Логічних потоків процесора (CPU):</b> <b>${threads} потоків</b><br>
-
-                        • <b>Фізична роздільна здатність екрана:</b> <b>${resLabel}</b> | Частота: <b style="color: var(--neon-green);">~${detectedHz} Гц</b>${tabletNote}${hwidRuleNote}<br>
-
-                        • <b>Рекомендація:</b> Обирайте <b>TALOS 60FPS PRO</b> для максимальної якості нейромережі RIFE AI (60–144 FPS)!
-
-                    </p>`;
-
-            } else {
-
-                box.style.borderColor = "var(--neon-gold)";
-
-                reportHtml = `
-
-                    <h3 style="color: var(--neon-gold); margin-bottom: 10px;">⚡ ВЕРДИКТ ОНЛАЙН-СКАНЕРА: Для вашого ПК з Windows ідеально підійде версія TALOS LITE!</h3>
-
-                    <p style="color: var(--text-primary); font-size: 0.94rem; line-height: 1.65;">
-
-                        • <b>Операційна система:</b> <b>Windows 10/11 (Сумісна)</b><br>
-
-                        • <b>Виявлена відеокарта (GPU):</b> <span style="color: var(--neon-blue); font-weight: 700;">${cleanGpu}</span><br>
-
-                        • <b>Логічних потоків процесора (CPU):</b> <b>${threads} потоків</b><br>
-
-                        • <b>Фізична роздільна здатність екрана:</b> <b>${resLabel}</b> | Частота: <b style="color: var(--neon-gold);">~${detectedHz} Гц</b>${tabletNote}${hwidRuleNote}<br>
-
-                        • <b>Рекомендація:</b> Обирайте <b>TALOS 60FPS LITE</b> (стабільні 60 FPS за рахунок багатопотокового процесора).
-
-                    </p>`;
-
-            }
-
-        }
-
-
-
-        if (currentLang !== 'uk') {
-
-            // Використовується рідна багатомовна таблиця TALOS
-
-        }
-
-        box.innerHTML = reportHtml;
-
-    }
-
-
-
-    // =========================================================================
-
-    // СИСТЕМА ВІДГУКІВ ТА ВІДПОВІДЕЙ РОЗРОБНИКА (БЕЗ БЛОКУВАННЯ КАЛЬОК/ЖАРТІВ)
-
-    // =========================================================================
-
-    let selectedReviewStars = 5;
-
-    let activeReplyReviewIdx = -1;
-
-
-
-    function setReviewStars(n) {
-
-        selectedReviewStars = n;
-
-        const btns = document.querySelectorAll('#star-buttons-wrap .star-btn');
-
-        btns.forEach((b, idx) => b.classList.toggle('lit', idx < n));
-
-        const txt = document.getElementById('star-count-txt');
-
-        if (txt) txt.textContent = `${n} / 5`;
-
-    }
-
-
-
-    function syncClientCacheBuffer() {
-
-        try {
-
-            const raw = localStorage.getItem('talos_rev_cache_v82');
-
-            return raw ? JSON.parse(raw) : [];
-
-        } catch(e) { return []; }
-
-    }
-
-
-
-    async function renderReviewsList() {
-
-        const container = document.getElementById('reviews-container');
-
-        if (!container) return;
-
-        const cfg = window.TALOS_CONFIG || {};
-
-        const approved = window.TALOS_APPROVED_REVIEWS || cfg.approvedReviews || [];
-
-        const localOwn = syncClientCacheBuffer();
-
-
-
-        const allReviews = [...localOwn, ...approved];
-
-        window._CURRENT_MERGED_REVIEWS = allReviews;
-
-        const isUk = (currentLang === 'uk');
-
-        const isAdminUnlocked = (sessionStorage.getItem('talos_diag_auth') === '1');
-
-
-
-        let htmlCards = [];
-
-        for (let i = 0; i < allReviews.length; i++) {
-
-            const rev = allReviews[i];
-
-            const isPro = (rev.edition === 'PRO');
-
-            const badgeClass = isPro ? 'hw-pro' : 'hw-lite';
-
-            const edLabel = isPro ? 'TALOS PRO' : 'TALOS LITE';
-
-
-
-            let author = isUk ? (rev.nameUk || rev.nameEn) : (rev.nameEn || rev.nameUk);
-
-            let hw = isUk ? (rev.hwUk || rev.hwEn) : (rev.hwEn || rev.hwUk);
-
-            let body = isUk ? (rev.textUk || rev.textEn) : (rev.textEn || rev.textUk);
-
-            let replyTxt = isUk ? (rev.devReplyUk || rev.devReplyEn || "") : (rev.devReplyEn || rev.devReplyUk || "");
-
-
-
-            if (currentLang !== 'uk' && currentLang !== 'en') {
-
-                body = await translateTextGTX(body, currentLang);
-
-                hw = await translateTextGTX(hw, currentLang);
-
-                if (replyTxt) replyTxt = await translateTextGTX(replyTxt, currentLang);
-
-            }
-
-
-
-            const starsStr = '★'.repeat(rev.stars || 5) + '☆'.repeat(5 - (rev.stars || 5));
-
-            const verLabel = isUk ? '✔ Перевірений користувач TALOS' : '✔ Verified TALOS User';
-
-            const updBadgeHtml = rev.updatedBadge
-
-                ? `<div class="updated-score-pill">🔄 ${isUk ? 'Оцінку оновлено після патчу розробника' : 'Rating updated after developer patch'}</div>`
-
-                : ``;
-
-
-
-            const devBubbleHtml = replyTxt
-
-                ? `<div class="dev-reply-bubble">
-
-                       <div class="dev-reply-hdr">
-
-                           <span>⚡ TALOS VISION LABS ${isUk ? '(Відповідь розробника)' : '(Developer Reply)'}</span>
-
-                           <span style="opacity:0.75; font-weight:600;">${rev.devReplyDate || ''}</span>
-
-                       </div>
-
-                       <div class="dev-reply-txt">${replyTxt}</div>
-
-                   </div>`
-
-                : ``;
-
-
-
-            const adminBtnHtml = isAdminUnlocked
-
-                ? `<button class="admin-reply-btn" onclick="openDevReplyBuilder(${i})">💬 Відповісти</button>`
-
-                : ``;
-
-
-
-            htmlCards.push(`
-
-                <div class="review-card">
-
-                    <div style="display:flex; flex-direction:column;">
-
-                        <div class="review-top">
-
-                            <span class="review-author">${author}</span>
-
-                            <span class="review-stars">${starsStr}</span>
-
-                        </div>
-
-                        <div class="review-hw-badge ${badgeClass}" style="align-self:flex-start;">
-
-                            💻 ${edLabel} • ${hw}
-
-                        </div>
-
-                        ${updBadgeHtml}
-
-                        <p class="review-text">«${body}»</p>
-
-                        ${devBubbleHtml}
-
-                    </div>
-
-                    <div class="review-footer">
-
-                        <span class="verified-tag">${verLabel}</span>
-
-                        <div style="display:flex; align-items:center; gap:8px;">
-
-                            ${adminBtnHtml}
-
-                            <span>${rev.date || '2026'}</span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            `);
-
-        }
-
-        container.innerHTML = htmlCards.join('');
-
-    }
-
-
-
-    function openDevReplyBuilder(idx) {
-
-        const list = window._CURRENT_MERGED_REVIEWS || [];
-
-        const rev = list[idx];
-
-        if (!rev) return;
-
-        activeReplyReviewIdx = idx;
-
-        document.getElementById('dev-reply-target-info').innerHTML =
-
-            `Відповідь для: <b style="color:var(--neon-green);">${rev.nameUk}</b> (${rev.hwUk}) ${rev.email ? '• ✉ ' + rev.email : ''}`;
-
-        document.getElementById('dev-reply-textarea').value = rev.devReplyUk || "";
-
-        document.getElementById('dev-reply-modal').classList.add('open');
-
-    }
-
-
-
-    function applyDevReplyAndCopyJson() {
-
-        const list = window._CURRENT_MERGED_REVIEWS || [];
-
-        const rev = list[activeReplyReviewIdx];
-
-        if (!rev) return;
-
-        const txt = document.getElementById('dev-reply-textarea').value.trim();
-
-        const now = new Date();
-
-        const dStr = `${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth()+1).padStart(2,'0')}.${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-
-        rev.devReplyUk = txt;
-
-        rev.devReplyEn = txt;
-
-        rev.devReplyDate = dStr;
-
-
-
-        const own = syncClientCacheBuffer();
-
-        if (activeReplyReviewIdx < own.length) {
-
-            own[activeReplyReviewIdx] = rev;
-
-            try { localStorage.setItem('talos_rev_cache_v82', JSON.stringify(own)); } catch(e){}
-
-        }
-
-
-
-        const snippet = JSON.stringify(rev, null, 8);
-
-        navigator.clipboard.writeText(snippet).catch(()=>{});
-
-        closeModal('dev-reply-modal');
-
-        renderReviewsList();
-
-        alert("✅ Відповідь додано до картки, а готовий блок JSON скопійовано в буфер обміну!");
-
-    }
-
-
-
-    function notifyReviewerByGmail() {
-
-        const list = window._CURRENT_MERGED_REVIEWS || [];
-
-        const rev = list[activeReplyReviewIdx];
-
-        if (!rev) return;
-
-        const clientMail = rev.email || "";
-
-        const replyTxt = document.getElementById('dev-reply-textarea').value.trim() || "Ми врахували ваш відгук і випустили оновлення програми TALOS 60FPS!";
-
-        const subj = "TALOS VISION LABS — Ваше зауваження виправлено у новому оновленні!";
-
-        const body = `Вітаємо, ${rev.nameUk}!\n\nДякуємо за ваш відгук щодо роботи TALOS 60FPS на конфігурації (${rev.hwUk}).\n\nВідповідь розробника:\n"${replyTxt}"\n\nВи можете оновити програму та за бажанням оновити вашу оцінку на нашому сайті: https://talosvision.github.io/#reviews\n\nЗ повагою,\nКоманда TALOS VISION R&D LABS`;
-
-        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(clientMail)}&su=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
-
-        window.open(gmailUrl, "TalosClientNotify", "width=620,height=560");
-
-    }
-
-
-
-    async function submitUserReview() {
-
-        const nameEl = document.getElementById('rev-name');
-
-        const hwEl = document.getElementById('rev-hw');
-
-        const edEl = document.getElementById('rev-edition');
-
-        const emailEl = document.getElementById('rev-email');
-
-        const isUpdEl = document.getElementById('rev-is-update');
-
-        const textEl = document.getElementById('rev-text');
-
-        const msgEl = document.getElementById('rev-status-msg');
-
-
-
-        const name = escapeHtmlSanitizer(nameEl.value.trim());
-
-        const hw = escapeHtmlSanitizer(hwEl.value.trim());
-
-        const edition = edEl.value;
-
-        const email = emailEl ? emailEl.value.trim() : "";
-
-        const isUpdate = isUpdEl ? isUpdEl.checked : false;
-
-        const text = escapeHtmlSanitizer(textEl.value.trim());
-
-
-
-        if (!name || !hw || text.length < 10) {
-
-            msgEl.style.color = 'var(--neon-bronze)';
-
-            msgEl.textContent = (currentLang === 'uk')
-
-                ? "⚠ Будь ласка, заповніть ім'я, ваше обладнання та напишіть розгорнутий відгук."
-
-                : "⚠ Please fill in your name, hardware specs, and write a detailed review.";
-
-            return;
-
-        }
-
-
-
-        const now = new Date();
-
-        const dateStr = `${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth()+1).padStart(2,'0')}.${now.getFullYear()}`;
-
-
-
-        const newRevObj = {
-
-            nameUk: name, nameEn: name,
-
-            edition: edition,
-
-            hwUk: hw, hwEn: hw,
-
-            stars: selectedReviewStars,
-
-            date: dateStr,
-
-            updatedBadge: isUpdate,
-
-            email: email,
-
-            textUk: text, textEn: text,
-
-            devReplyUk: "", devReplyEn: "", devReplyDate: ""
-
-        };
-
-
-
-        const ownList = syncClientCacheBuffer();
-
-        const existingIdx = ownList.findIndex(r => r.nameUk.toLowerCase() === name.toLowerCase() || (email && r.email === email));
-
-        if (existingIdx >= 0) {
-
-            newRevObj.updatedBadge = true;
-
-            ownList[existingIdx] = newRevObj;
-
-        } else {
-
-            ownList.unshift(newRevObj);
-
-        }
-
-        try { localStorage.setItem('talos_rev_cache_v82', JSON.stringify(ownList)); } catch(e){}
-
-
-
-        nameEl.value = '';
-
-        hwEl.value = '';
-
-        if (emailEl) emailEl.value = '';
-
-        if (isUpdEl) isUpdEl.checked = false;
-
-        textEl.value = '';
-
-        msgEl.style.color = 'var(--neon-green)';
-
-        msgEl.textContent = isUpdate
-
-            ? "✅ Вашу оцінку та відгук успішно оновлено!"
-
-            : "✅ Дякуємо! Ваш відгук успішно опубліковано на сторінці!";
-
-
-
-        renderReviewsList();
-
-
-
-        // Відправляємо у хмарний ШІ-модератор (якщо підключено telemetryCloudUrl) та на пошту
-
-        try {
-
-            const cfg = window.TALOS_CONFIG || {};
-
-            if (cfg.telemetryCloudUrl && cfg.telemetryCloudUrl.startsWith("http")) {
-
-                fetch(cfg.telemetryCloudUrl, {
-
-                    method: "POST",
-
-                    mode: "no-cors",
-
-                    headers: { "Content-Type": "application/json" },
-
-                    body: JSON.stringify({ type: "NEW_REVIEW", review: newRevObj })
-
-                }).catch(()=>{});
-
-            }
-
-            // Сповіщення надсилається у надсучасному кіберпанк HTML-форматі через хмарний сервер TALOS_Cloud_Master v10.3
-
-        } catch(e) {}
-
-    }
-
-
-
-    // =========================================================================
-
-    // СИСТЕМНА ДІАГНОСТИКА ВІДВІДУВАНЬ ТА ОБЛІК МЕДАЛЕЙ ДО СЕКУНД
-
-    // =========================================================================
-
-    let currentRadarFilter = 'all';
-
-
-
-    function detectVisitorDeviceAndOS() {
-
-        const ua = navigator.userAgent || "";
-
-        const isMob = /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || (navigator.maxTouchPoints > 1 && window.screen.width < 1024);
-
-        const devType = isMob ? "Mobile" : "PC";
-
-        let os = "Windows / Desktop";
-
-        if (/Windows NT 10\.0/i.test(ua)) os = "Windows 10/11 (x64)";
-
-        else if (/Android/i.test(ua)) os = "Android Smartphone";
-
-        else if (/iPhone|iPad/i.test(ua)) os = "iPhone / iOS";
-
-        else if (/Mac OS X/i.test(ua)) os = "macOS";
-
-        else if (/Linux/i.test(ua)) os = "Linux";
-
-        return { devType, os };
-
-    }
-
-
-
-    function detectTrafficSource() {
-
-        const params = new URLSearchParams(window.location.search);
-
-        const utm = params.get('utm_source') || params.get('ref') || "";
-
-        const ref = document.referrer || "";
-
-        const combined = (utm + " " + ref).toLowerCase();
-
-        if (combined.includes("youtube") || combined.includes("youtu.be")) return "YouTube (@TalosVisionLabs)";
-
-        if (combined.includes("google") || combined.includes("bing") || combined.includes("duckduckgo")) return "Google Пошук";
-
-        if (combined.includes("t.me") || combined.includes("telegram") || combined.includes("viber") || combined.includes("facebook") || combined.includes("instagram") || combined.includes("tiktok")) return "Telegram / Соцмережі";
-
-        if (ref && !ref.includes(window.location.hostname)) return "Зовнішній сайт: " + ref.slice(0, 32);
-
-        return "Прямий захід (Direct)";
-
-    }
-
-
-
-    function detectQuickWebGLGpu() {
-
-        let gpu = "Standard GPU";
-
-        try {
-
-            const c = document.createElement('canvas');
-
-            const gl = c.getContext('webgl') || c.getContext('experimental-webgl');
-
-            if (gl) {
-
-                const dbg = gl.getExtension('WEBGL_debug_renderer_info');
-
-                if (dbg) gpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
-
-            }
-
-        } catch(e){}
-
-        gpu = gpu.replace(/^ANGLE\s*\([^,]+,\s*/i, '').replace(/\s*\(0x[0-9a-fA-F]+\).*$/, '').replace(/\s*Direct3D.*$/i, '').replace(/\)$/, '').trim();
-
-        const dpr = window.devicePixelRatio || 1;
-
-        let pw = Math.round(window.screen.width * dpr);
-
-        let ph = Math.round(window.screen.height * dpr);
-
-        const std = [[3840, 2160], [2560, 1440], [1920, 1080]];
-
-        for (let [sw, sh] of std) {
-
-            if (Math.abs(pw - sw) <= 25 && Math.abs(ph - sh) <= 25) { pw = sw; ph = sh; break; }
-
-        }
-
-        const isPro = /RTX|RX\s*6|RX\s*7|RX\s*8|Radeon\s*PRO/i.test(gpu);
-
-        return { gpu: gpu || "Integrated GPU", res: `${pw}×${ph}`, isPro };
-
-    }
-
-
-
-    function getStoredTelemetryLogs() {
-
-        try {
-
-            const raw = localStorage.getItem('talos_diag_logs_v82');
-
-            if (raw) return JSON.parse(raw);
-
-        } catch(e){}
-
-        return [];
-
-    }
-
-
-
-    async function collectSilentVisitorTelemetry() {
-
-        if (sessionStorage.getItem('talos_visit_logged_v82')) return;
-
-        sessionStorage.setItem('talos_visit_logged_v82', '1');
-
-
-
-        const { devType, os } = detectVisitorDeviceAndOS();
-
-        const source = detectTrafficSource();
-
-        const { gpu, res, isPro } = detectQuickWebGLGpu();
-
-
-
-        let ip = "Локальний IP";
-
-        let country = "Україна";
-
-        let city = "Одеса";
-
-        let flag = "🇺🇦";
-
-
-
-        try {
-
-            const r = await fetch("https://ipwho.is/");
-
-            const d = await r.json();
-
-            if (d && d.success) {
-
-                ip = d.ip || ip;
-
-                country = d.country || country;
-
-                city = d.city || city;
-
-                if (d.flag && d.flag.emoji) flag = d.flag.emoji;
-
-            }
-
-        } catch(e){}
-
-
-
-        const now = new Date();
-
-        const timeStr = `${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth()+1).padStart(2,'0')}.${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-
-
-
-        const visitRecord = { time: timeStr, ip, country, city, flag, devType, os, gpu, res, isPro, source };
-
-
-
-        const logs = getStoredTelemetryLogs();
-
-        logs.unshift(visitRecord);
-
-        try { localStorage.setItem('talos_diag_logs_v82', JSON.stringify(logs.slice(0, 300))); } catch(e){}
-
-
-
-        const cfg = window.TALOS_CONFIG || {};
-
-        if (cfg.telemetryCloudUrl && cfg.telemetryCloudUrl.startsWith("http")) {
-
-            try {
-
-                await fetch(cfg.telemetryCloudUrl, {
-
-                    method: "POST",
-
-                    mode: "no-cors",
-
-                    headers: { "Content-Type": "application/json" },
-
-                    body: JSON.stringify({ type: "VISIT", data: visitRecord })
-
-                });
-
-            } catch(e){}
-
-        }
-
-    }
-
-
-
-    function getEggHuntersLogs() {
-
-        try {
-
-            const raw = localStorage.getItem('talos_egg_hunters_v82');
-
-            if (raw) return JSON.parse(raw);
-
-        } catch(e){}
-
-        return [];
-
-    }
-
-
-
-    function recordMedalUnlockToTelemetry(tier) {
-
-        const now = new Date();
-
-        const exactSecStr = `${String(now.getDate()).padStart(2,'0')}.${String(now.getMonth()+1).padStart(2,'0')}.${now.getFullYear()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-
-        const ms = now.getTime();
-
-
-
-        const visits = getStoredTelemetryLogs();
-
-        const curVisit = visits[0] || { ip: "Локальний IP", country: "Україна", city: "Одеса", devType: "PC", os: "Windows 11", gpu: "RTX 4070 Ti" };
-
-        const hunters = getEggHuntersLogs();
-
-
-
-        let hunter = hunters.find(h => h.ip === curVisit.ip);
-
-        if (!hunter) {
-
-            hunter = {
-
-                ip: curVisit.ip,
-
-                country: curVisit.country || "Україна",
-
-                city: curVisit.city || "",
-
-                dev: `${curVisit.devType} • ${curVisit.os} (${curVisit.gpu})`,
-
-                bronzeTime: "—",
-
-                silverTime: "—",
-
-                goldTime: "—",
-
-                lastUpdateMs: ms,
-
-                count: 0
-
-            };
-
-            hunters.push(hunter);
-
-        }
-
-
-
-        if (tier === 'bronze' && hunter.bronzeTime === "—") hunter.bronzeTime = exactSecStr;
-
-        if (tier === 'silver' && hunter.silverTime === "—") hunter.silverTime = exactSecStr;
-
-        if (tier === 'gold' && hunter.goldTime === "—") hunter.goldTime = exactSecStr;
-
-
-
-        hunter.count = (hunter.bronzeTime !== "—" ? 1 : 0) + (hunter.silverTime !== "—" ? 1 : 0) + (hunter.goldTime !== "—" ? 1 : 0);
-
-        hunter.lastUpdateMs = ms;
-
-
-
-        hunters.sort((a, b) => a.lastUpdateMs - b.lastUpdateMs);
-
-        try { localStorage.setItem('talos_egg_hunters_v82', JSON.stringify(hunters)); } catch(e){}
-
-        const cfg = window.TALOS_CONFIG || {};
-
-        if (cfg.telemetryCloudUrl && cfg.telemetryCloudUrl.startsWith("http")) {
-
-            fetch(cfg.telemetryCloudUrl, {
-
-                method: "POST", mode: "no-cors",
-
-                headers: { "Content-Type": "application/json" },
-
-                body: JSON.stringify({ type: "MEDAL", data: hunter })
-
-            }).catch(()=>{});
-
-        }
-
-    }
-
-
-
-    function openSecretRadarDashboard() {
-
-        if (sessionStorage.getItem('talos_diag_auth') === '1') {
-
-            showUnlockedRadarWindow();
-
-        } else {
-
-            const pinInp = document.getElementById('admin-pin-input');
-
-            const errEl = document.getElementById('pin-err-msg');
-
-            if (pinInp) pinInp.value = '';
-
-            if (errEl) errEl.textContent = '';
-
-            document.getElementById('pin-modal').classList.add('open');
-
-            setTimeout(() => { if (pinInp) pinInp.focus(); }, 100);
-
-        }
-
-    }
-
-
-
-        async function verifyCustomPinModal() {
-        const entered = (document.getElementById('admin-pin-input').value || '').trim();
-        if (_hHash(entered) === _PIN_DIGEST) {
-            sessionStorage.setItem('talos_diag_auth', '1');
-            try {
-                if (window.crypto && window.crypto.subtle) {
-                    const buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode('TALOS_SALT_v10_' + entered));
-                    const srvKey = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-                    sessionStorage.setItem('talos_srv_sha256', srvKey);
-                }
-            } catch (e) {}
-            closeModal('pin-modal');
-            renderReviewsList();
-            showUnlockedRadarWindow();
-        } else {
-            document.getElementById('pin-err-msg').textContent = "❌ Невірний код авторизації!";
-        }
-    }
-
-
-
-    async function showUnlockedRadarWindow() {
-
-        const cfg = window.TALOS_CONFIG || {};
-
-        document.getElementById('radar-modal').classList.add('open');
-
-        document.body.style.overflow = 'hidden';
-
-
-
-        const statusEl = document.getElementById('radar-cloud-status');
-
-        if (cfg.telemetryCloudUrl && cfg.telemetryCloudUrl.startsWith("http")) {
-
-            statusEl.textContent = "⏳ Синхронізація мобільних та глобальних візитів із хмарою...";
-
-            try {
-
-                const res = await fetch(cfg.telemetryCloudUrl + "?auth=" + (sessionStorage.getItem("talos_srv_sha256") || "") + "&t=" + Date.now());
-
-                const cloudPayload = await res.json();
-
-                if (cloudPayload && Array.isArray(cloudPayload.visits)) {
-
-                    localStorage.setItem('talos_diag_logs_v82', JSON.stringify(cloudPayload.visits));
-
-                } else if (Array.isArray(cloudPayload)) {
-
-                    localStorage.setItem('talos_diag_logs_v82', JSON.stringify(cloudPayload));
-
-                }
-
-                if (cloudPayload && Array.isArray(cloudPayload.medals)) {
-
-                    localStorage.setItem('talos_egg_hunters_v82', JSON.stringify(cloudPayload.medals));
-
-                }
-
-                statusEl.textContent = "☁️ Хмарна синхронізація активна (Усі пристрої)";
-
-            } catch(e) {
-
-                statusEl.textContent = "⚠️ Хмара недоступна — показано локальний кеш";
-
-            }
-
-        } else {
-
-            statusEl.textContent = "⚡ Локальний режим (вставте telemetryCloudUrl у links_config.js для збору з телефонів)";
-
-        }
-
-        renderRadarDashboard();
-
-    }
-
-
-
-    function setRadarFilter(filt, btn) {
-
-        currentRadarFilter = filt;
-
-        document.querySelectorAll('.r-filt-btn').forEach(b => b.classList.remove('active'));
-
-        if (btn) btn.classList.add('active');
-
-        renderRadarDashboard();
-
-    }
-
-
-
-    function renderRadarDashboard() {
-
-        const allLogs = getStoredTelemetryLogs();
-
-        const total = allLogs.length || 1;
-
-        const uniqueIps = new Set(allLogs.map(x => x.ip)).size;
-
-        const pcCount = allLogs.filter(x => x.devType === 'PC').length;
-
-        const mobCount = allLogs.length - pcCount;
-
-        const pcPct = allLogs.length ? Math.round((pcCount / total) * 100) : 0;
-
-        const mobPct = allLogs.length ? (100 - pcPct) : 0;
-
-        const proCount = allLogs.filter(x => x.isPro).length;
-
-        const proPct = allLogs.length ? Math.round((proCount / total) * 100) : 0;
-
-
-
-        document.getElementById('kpi-total-visits').textContent = allLogs.length;
-
-        document.getElementById('kpi-unique-ips').textContent = uniqueIps;
-
-        document.getElementById('kpi-pc-ratio').textContent = `${pcPct}% / ${mobPct}%`;
-
-        document.getElementById('kpi-pro-gpus').textContent = `${proPct}% (${proCount})`;
-
-
-
-        const ring = document.getElementById('radar-donut-ring');
-
-        if (ring) {
-
-            ring.style.background = `conic-gradient(var(--neon-green) 0% ${pcPct}%, var(--neon-gold) ${pcPct}% 100%)`;
-
-        }
-
-        document.getElementById('radar-donut-center').textContent = `${pcPct}% ПК`;
-
-        document.getElementById('radar-donut-legend').innerHTML = `
-
-            <div><span style="color:var(--neon-green);">●</span> <b>ПК / Ноутбуки:</b> ${pcCount} (${pcPct}%)</div>
-
-            <div><span style="color:var(--neon-gold);">●</span> <b>Смартфони:</b> ${mobCount} (${mobPct}%)</div>
-
-            <div style="color:var(--text-secondary); font-size:0.75rem; margin-top:4px;">Готові до PRO: ${proCount} ПК</div>
-
-        `;
-
-
-
-        const countryMap = {};
-
-        allLogs.forEach(x => {
-
-            const k = `${x.country}`;
-
-            countryMap[k] = (countryMap[k] || 0) + 1;
-
-        });
-
-        const sortedCountries = Object.entries(countryMap).sort((a,b) => b[1] - a[1]).slice(0, 4);
-
-        document.getElementById('radar-countries-bars').innerHTML = sortedCountries.map(([cName, cnt]) => {
-
-            const pct = Math.round((cnt / total) * 100);
-
-            return `
-
-                <div class="bar-item">
-
-                    <div class="bar-hdr"><span>🌍 ${cName}</span><span>${cnt} (${pct}%)</span></div>
-
-                    <div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div>
-
-                </div>`;
-
-        }).join('');
-
-
-
-        const srcMap = {};
-
-        allLogs.forEach(x => {
-
-            const s = x.source || "Прямий захід";
-
-            srcMap[s] = (srcMap[s] || 0) + 1;
-
-        });
-
-        const sortedSources = Object.entries(srcMap).sort((a,b) => b[1] - a[1]).slice(0, 4);
-
-        document.getElementById('radar-sources-bars').innerHTML = sortedSources.map(([sName, cnt]) => {
-
-            const pct = Math.round((cnt / total) * 100);
-
-            return `
-
-                <div class="bar-item">
-
-                    <div class="bar-hdr"><span>🔗 ${sName}</span><span>${cnt} (${pct}%)</span></div>
-
-                    <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-bronze));"></div></div>
-
-                </div>`;
-
-        }).join('');
-
-
-
-        const theadRow = document.querySelector('.radar-table thead tr');
-
-        const tbody = document.getElementById('radar-log-tbody');
-
-
-
-        if (currentRadarFilter === 'medals') {
-
-            theadRow.innerHTML = '<th>Місце (Рейтинг)</th><th>IP та Локація переможця</th><th>Пристрій та GPU</th><th>🥉 Бронза / 🥈 Срібло / 🥇 Золото (Дата й час до секунд)</th><th>Статус квесту</th>';
-
-            const hunters = getEggHuntersLogs().slice().sort((a,b) => a.lastUpdateMs - b.lastUpdateMs);
-
-            if (!hunters.length) {
-
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:18px; color:var(--text-secondary);">Ще жодна медаль не була відкрита у цій сесії. Натисніть 5 разів на плашку LITE, PRO або «Створено в Україні»!</td></tr>`;
-
-                return;
-
-            }
-
-            tbody.innerHTML = hunters.map((h, idx) => {
-
-                const rankBadge = idx < 10
-
-                    ? `<b style="color:#ffd700; font-size:0.95rem;">#${idx + 1} (ТОП-10 ЗНИЖКА!)</b>`
-
-                    : `<b>#${idx + 1}</b>`;
-
-                const statusBadge = h.count === 3
-
-                    ? `<span style="color:var(--neon-green); font-weight:900;">🏆 УСІ 3 МЕДАЛІ (3/3)</span>`
-
-                    : `<span style="color:var(--neon-gold); font-weight:700;">Зібрано: ${h.count} / 3</span>`;
-
-                return `<tr>
-
-                    <td>${rankBadge}</td>
-
-                    <td><b style="color:var(--neon-blue);">${h.ip}</b><br><span style="font-size:0.75rem;">${h.country}, ${h.city}</span></td>
-
-                    <td><span style="font-size:0.78rem;">${h.dev}</span></td>
-
-                    <td style="font-family:monospace; font-size:0.78rem; line-height:1.5;">
-
-                        🥉 Бронза: <b style="color:#ff8c5a;">${h.bronzeTime}</b><br>
-
-                        🥈 Срібло: <b style="color:#d8dee9;">${h.silverTime}</b><br>
-
-                        🥇 Золото: <b style="color:#ffd700;">${h.goldTime}</b>
-
-                    </td>
-
-                    <td>${statusBadge}</td>
-
-                </tr>`;
-
-            }).join('');
-
-            return;
-
-        }
-
-
-
-        theadRow.innerHTML = '<th>Час та Дата (до сек)</th><th>IP-адреса та Локація</th><th>Пристрій та ОС</th><th>Відеокарта (WebGL) та Екран</th><th>Джерело переходу (Referrer)</th>';
-
-
-
-        const q = (document.getElementById('radar-search-inp').value || "").toLowerCase();
-
-        const filtered = allLogs.filter(x => {
-
-            if (currentRadarFilter === 'pc' && x.devType !== 'PC') return false;
-
-            if (currentRadarFilter === 'mobile' && x.devType !== 'Mobile') return false;
-
-            if (currentRadarFilter === 'pro' && !x.isPro) return false;
-
-            if (currentRadarFilter === 'youtube' && !(x.source || "").toLowerCase().includes('youtube')) return false;
-
-            if (q) {
-
-                const hay = `${x.ip} ${x.country} ${x.city} ${x.os} ${x.gpu} ${x.source}`.toLowerCase();
-
-                if (!hay.includes(q)) return false;
-
-            }
-
-            return true;
-
-        });
-
-
-
-        tbody.innerHTML = filtered.map(x => {
-
-            const devIcon = x.devType === 'PC' ? '💻 ПК' : '📱 Смартфон';
-
-            const gpuBadge = x.isPro
-
-                ? `<span style="color:var(--neon-green); font-weight:800;">[PRO] ${x.gpu}</span>`
-
-                : `<span style="color:var(--neon-gold);">${x.gpu}</span>`;
-
-            return `
-
-                <tr>
-
-                    <td style="white-space:nowrap; color:var(--text-secondary);">${x.time}</td>
-
-                    <td><b style="color:var(--neon-blue);">${x.ip}</b><br><span style="font-size:0.75rem;">${x.country}, ${x.city}</span></td>
-
-                    <td><b>${devIcon}</b><br><span style="font-size:0.75rem; color:var(--text-secondary);">${x.os}</span></td>
-
-                    <td>${gpuBadge}<br><span style="font-size:0.74rem; color:var(--text-secondary);">Екран: ${x.res}</span></td>
-
-                    <td><span style="color:var(--text-primary); font-weight:700;">${x.source}</span></td>
-
-                </tr>`;
-
-        }).join('');
-
-    }
-
-
-
-    function exportTelemetryCsv() {
-
-        const logs = getStoredTelemetryLogs();
-
-        const rows = [["Час", "IP", "Країна", "Місто", "Пристрій", "ОС", "Відеокарта", "Екран", "PRO-сумісність", "Джерело"]];
-
-        logs.forEach(x => {
-
-            rows.push([x.time, x.ip, x.country, x.city, x.devType, x.os, x.gpu, x.res, x.isPro ? "PRO" : "LITE", x.source]);
-
-        });
-
-        const csvContent = "\uFEFF" + rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(";")).join("\r\n");
-
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-
-        a.href = url;
-
-        a.download = "TALOS_Visitors_Telemetry_Report.csv";
-
-        document.body.appendChild(a);
-
-        a.click();
-
-        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
-
-    }
-
-
-
-            let _secretKeySeq = [];
-
-    document.addEventListener('keydown', function(e) {
-
-        if (e.key === 'Escape') {
-
-            ['apollo-modal', 'bot-modal', 'egg-modal', 'email-modal', 'radar-modal', 'pin-modal', 'dev-reply-modal'].forEach(closeModal);
-
-            return;
-
-        }
-
-        if (e.ctrlKey && e.shiftKey && !e.altKey && (e.code === 'KeyQ' || e.code === 'KeyL')) {
-
-            e.preventDefault();
-
-            openSecretRadarDashboard();
-
-            return;
-
-        }
-
-        const tag = (e.target && e.target.tagName) ? e.target.tagName.toUpperCase() : '';
-
-        if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
-
-            _secretKeySeq.push(e.code);
-
-            if (_secretKeySeq.length > 4) _secretKeySeq.shift();
-
-            if (_hHash(_secretKeySeq.join(',')) === _SEQ_DIGEST) {
-
-                _secretKeySeq = [];
-
-                openSecretRadarDashboard();
-
-            }
-
-        }
-
-    });
-
-
-
-    function launchSmartGmailPopup() {
-
-        const cfg = window.TALOS_CONFIG || {};
-
-        const toMail = cfg.supportEmail || "talosvision.labs@gmail.com";
-
-        const subj = document.getElementById('quick-mail-subj').value || "TALOS VISION Support";
-
-        const body = document.getElementById('quick-mail-body').value || "";
-
-
-
-        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(toMail)}&su=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
-
-        const w = 600, h = 560;
-
-        const left = Math.max(0, window.screen.availWidth - w - 30);
-
-        const top = Math.max(0, window.screen.availHeight - h - 50);
-
-        window.open(gmailUrl, "TalosGmailCompose", `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`);
-
-        closeModal('email-modal');
-
-    }
-
-
-
-    function toggleLangMenu(e) {
-
-        e.stopPropagation();
-
-        document.getElementById('lang-menu').classList.toggle('show');
-
-    }
-
-    document.addEventListener('click', () => {
-
-        const m = document.getElementById('lang-menu');
-
-        if (m) m.classList.remove('show');
-
-    });
-
-
-
-    function openApolloModal() {
-
-        document.getElementById('apollo-modal').classList.add('open');
-
-        document.body.style.overflow = 'hidden';
-
-    }
-
-    function openSupportBot() {
-
-        document.getElementById('bot-modal').classList.add('open');
-
-        document.body.style.overflow = 'hidden';
-
-    }
-
-    function openEmailActionModal(mode) {
-
-        const activeDict = currentLang === 'uk' ? ORIG_UK : (TRANS_CACHE[currentLang] || EN_FULL);
-
-        const subjInput = document.getElementById('quick-mail-subj');
-
-        if (activeDict && activeDict.em_subj_val) {
-
-            subjInput.value = activeDict.em_subj_val;
-
-        }
-
-        document.getElementById('email-modal').classList.add('open');
-
-        document.body.style.overflow = 'hidden';
-
-    }
-
-    function closeModal(id) {
-
-        const el = document.getElementById(id);
-
-        if (el) el.classList.remove('open');
-
-        document.body.style.overflow = '';
-
-    }
-
-    function closeModalOutside(e, id) {
-
-        if (e.target.id === id) closeModal(id);
-
-    }
-
-
-
-    function copyLabEmail(btn) {
-
-        const cfg = window.TALOS_CONFIG || {};
-
-        const mail = cfg.supportEmail || "talosvision.labs@gmail.com";
-
-        navigator.clipboard.writeText(mail);
-
-        const old = btn.innerHTML;
-
-        btn.innerHTML = "✅ " + mail;
-
-        setTimeout(() => btn.innerHTML = old, 2500);
-
-    }
-
-
-
-    function handleBuyClick(edition) {
-
-        const cfg = window.TALOS_CONFIG || {};
-
-        const url = edition === 'pro' ? cfg.buyProUrl : cfg.buyLiteUrl;
-
-        if (url && url.startsWith('http')) {
-
-            window.open(url, '_blank');
-
-        } else {
-
-            openEmailActionModal(edition);
-
-        }
-
-    }
-
-
-
-    function handleDonateApolloClick() {
-
-        const cfg = window.TALOS_CONFIG || {};
-
-        if (cfg.donateApolloUrl && cfg.donateApolloUrl.startsWith('http')) {
-
-            window.open(cfg.donateApolloUrl, '_blank');
-
-        } else {
-
-            closeModal('apollo-modal');
-
-            openEmailActionModal('apollo');
-
-        }
-
-    }
-
-
-
-    function getMedalSvg(colorHex, ribbonHex, label) {
-
-        return `
-
-        <svg width="72" height="72" viewBox="0 0 64 64" fill="none">
-
-            <polygon points="20,4 28,4 26,24 16,24" fill="${ribbonHex}"/>
-
-            <polygon points="44,4 36,4 38,24 48,24" fill="${ribbonHex}"/>
-
-            <circle cx="32" cy="40" r="18" fill="${colorHex}" stroke="#ffffff" stroke-width="2"/>
-
-            <circle cx="32" cy="40" r="13" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="1.5" stroke-dasharray="3 2"/>
-
-            <text x="32" y="45" text-anchor="middle" fill="#07070c" font-weight="900" font-size="13" font-family="Segoe UI">${label}</text>
-
-        </svg>`;
-
-    }
-
-
-
-    function renderEggContent(tier) {
-
-        currentEggTier = tier;
-
-        const winBox = document.getElementById('egg-window-box');
-
-        const hdr = document.getElementById('egg-header-txt');
-
-        const title = document.getElementById('egg-title-txt');
-
-        const body = document.getElementById('egg-body-txt');
-
-        const status = document.getElementById('egg-status-box');
-
-        const svgBox = document.getElementById('egg-svg-badge');
-
-
-
-        let color = '#FFD700';
-
-        if (tier === 'bronze') {
-
-            color = '#ff8c5a';
-
-            svgBox.innerHTML = getMedalSvg('#ff8c5a', '#00d2ff', 'III');
-
-        } else if (tier === 'silver') {
-
-            color = '#00f59b';
-
-            svgBox.innerHTML = getMedalSvg('#d8dee9', '#00f59b', 'II');
-
-        } else {
-
-            color = '#FFD700';
-
-            svgBox.innerHTML = getMedalSvg('#FFD700', '#0057B7', 'I');
-
-        }
-
-
-
-        winBox.style.borderColor = color;
-
-        hdr.style.color = color;
-
-        status.style.borderColor = color;
-
-        status.style.color = color;
-
-
-
-        hdr.setAttribute('data-i18n', `egg_${tier}_hdr`);
-
-        title.setAttribute('data-i18n', `egg_${tier}_title`);
-
-        body.setAttribute('data-i18n', `egg_${tier}_text`);
-
-        status.setAttribute('data-i18n', `egg_${tier}_rank`);
-
-
-
-        const activeDict = currentLang === 'uk' ? ORIG_UK : (TRANS_CACHE[currentLang] || EN_FULL);
-
-        [hdr, title, body, status].forEach(el => {
-
-            const k = el.getAttribute('data-i18n');
-
-            if (activeDict && activeDict[k]) el.innerHTML = activeDict[k];
-
-        });
-
-    }
-
-
-
-    function triggerEasterEgg(tier, btn) {
-
-        eggCounters[tier]++;
-
-        const span = document.getElementById(`egg-cnt-${tier}`);
-
-        btn.style.transform = 'scale(1.08)';
-
-        setTimeout(() => btn.style.transform = '', 150);
-
-
-
-        if (eggCounters[tier] < 5) {
-
-            if (span) span.textContent = `[${eggCounters[tier]}/5]`;
-
-        } else {
-
-            eggCounters[tier] = 0;
-
-            if (span) span.textContent = '';
-
-            recordMedalUnlockToTelemetry(tier);
-
-            renderEggContent(tier);
-
-            document.getElementById('egg-modal').classList.add('open');
-
-            document.body.style.overflow = 'hidden';
-
-        }
-
-    }
-
-
-
-    const BOT_KNOWLEDGE = {
-
-        pro_vs_lite: {
-
-            short: "<b>TALOS PRO (830 ₴ / $20)</b> генерує кадри нейромережею <b>RIFE v4.6 (Vulkan)</b> на відеокартах NVIDIA RTX / Radeon RX 6600+ (від 16 ГБ ОЗП) — це максимальна якість без ореолів.<br><br><b>TALOS LITE (415 ₴ / $10)</b> використовує математичний рушій <b>MVTools2 (ClangCL AVX2)</b> на процесорі і чудово працює навіть на слабких ноутбуках, інтегрованій графіці та Windows-планшетах (від 4 ГБ ОЗП).",
-
-            detail: "Уточню детально: кожна ліцензія прив'язується до заліза <b>1 конкретного пристрою (HWID)</b>. Якщо ви купуєте повну ліцензію (100%) для свого основного ПК, ви отримуєте право на <b>знижку -50% на додаткову ліцензію LITE виключно для вашого особистого Windows-планшета!</b>"
-
-        },
-
-        other_players: {
-
-            short: "<b>Коротка відповідь — НІ.</b> Комплекс <b>TALOS 60FPS</b> працює виключно через модифікований програвач <b>MPC-HC (Media Player Classic Home Cinema)</b>, який вже входить у наш інсталятор. Сторонні плеєри (VLC, PotPlayer, KMPlayer) не підтримують наш прямий конвеєр 54 параметрів DirectShow.",
-
-            detail: "Поясню, чому саме <b>MPC-HC</b>: ми на низькому рівні (через Реєстр Windows та DirectShow-монікери) з'єднали декодер MPC-HC напряму з рушієм <b>VapourSynth / RIFE AI</b> та рендерером <b>MPC Video Renderer</b>. Завдяки цьому ви просто відкриваєте будь-який відеофайл у нашому MPC-HC — і він миттєво йде в 60–144 FPS!"
-
-        },
-
-        tv_hdmi: {
-
-            short: "На внутрішню систему телевізора (Smart TV) програма не ставиться, бо потрібна потужність ПК. <b>Як вивести картинку з ПК/ноутбука на ТВ:</b><br>1) <b>По кабелю (найкраще для 60–144 Гц):</b> через <b>HDMI</b>, <b>DisplayPort</b> або <b>USB Type-C (Thunderbolt)</b>.<br>2) <b>По Wi-Fi (5 ГГц / Wi-Fi 6):</b> через бездротовий дисплей Windows (<b>Win + K</b> / Miracast) або <b>Moonlight / Steam Link</b>.",
-
-            detail: "Щодо <b>Bluetooth</b>: через Bluetooth можна передати на телевізор чи колонки лише <b>звук</b> (бо швидкість Bluetooth 2 Мбіт/с замала для відео). А для передачі самої картинки у 60–120 FPS використовуйте кабель (HDMI / DisplayPort / Type-C) або швидкий Wi-Fi 5/6 ГГц!"
-
-        },
-
-        restore_files: {
-
-            short: "<b>Ваша покупка назавжди прив'язана до вашої електронної пошти (Email) та вашого пристрою (1 ліцензія = 1 пристрій)!</b> Якщо ви перевстановили Windows або випадково видалили скачану папку з програмою на своєму ПК:<br>1) Просто відкрийте лист-квитанцію про покупку у своїй пошті та натисніть кнопку <b>«Завантажити файли»</b>.<br>2) Або напишіть нам зі своєї пошти покупки на <b>talosvision.labs@gmail.com</b> — ми миттєво надішлемо свіжу копію безкоштовно! А для власників ПК-версії діє <b>знижка -50% на додаткову ліцензію LITE для особистого Windows-планшета</b>.",
-
-            detail: "При перевстановленні Windows на тому самому комп'ютері ваш апаратний код заліза (HWID) не змінюється, тому ліцензія активується повторно без жодних доплат."
-
-        },
-
-        pricing_why: {
-
-            short: "Вартість становить <b>415 ₴ ($10) за версію LITE</b> та <b>830 ₴ ($20) за версію PRO</b> (разова покупка на 1 пристрій без підписок і без комісій). Бонус: тим, хто придбав повну ліцензію для ПК, надається <b>50% знижка на додаткову ліцензію LITE для особистого Windows-планшета</b>!",
-
-            detail: "Оплата проходить через захищений міжнародний сервіс. Кожна покупка напряму фінансує розробку українського ШІ-аудіолокалізатора ігор та кіно <b>APOLLO AI</b>!"
-
-        },
-
-        apollo_eta: {
-
-            short: "<b>APOLLO AI</b> — наш другий флагманський проєкт: нейромережа для перекладу та дубляжу ігор і кіно з англійської на українську <b>зі збереженням справжнього голосу, тембру й емоцій оригінального актора</b>.",
-
-            detail: "Зараз APOLLO AI перебуває на стадії R&D та тренування акустичних моделей (Voice & Emotion Cloning). Купуючи програвач TALOS 60FPS сьогодні або підтримуючи проєкт цільовим донатом, ви напряму прискорюєте вихід APOLLO!"
-
-        },
-
-        online_youtube: {
-
-            short: "Основне призначення <b>TALOS 60FPS</b> — бездоганне відтворення завантажених фільмів, серіалів та аніме (`.mkv`, `.mp4`, `.avi`, BDRemux, 4K HDR) у плеєрі MPC-HC. Також у MPC-HC можна відкривати прямі потокові посилання (`.m3u8` / `yt-dlp`).",
-
-            detail: "При перегляді локальних файлів у 1080p або 4K бітрейт і чіткість у рази вищі, ніж у браузері, тому нейромережа RIFE AI видає еталонну кінематографічну картинку."
-
-        },
-
-        greeting_chat: {
-
-            short: "Привіт! Я на зв'язку і готовий відповісти на будь-яке питання про <b>TALOS 60FPS</b> та <b>APOLLO AI</b>. Запитуйте про свій процесор, відеокарту, підключення до ТВ, знижку -50% на Windows-планшет чи оплату!",
-
-            detail: "Напишіть, яка у вас модель відеокарти та обсяг ОЗП — і я одразу підкажу, яку версію обрати!"
-
-        }
-
-    };
-
-
-
-    function appendChatMsg(text, isUser) {
-
-        const log = document.getElementById('chat-log');
-
-        const div = document.createElement('div');
-
-        div.className = isUser ? 'msg-user' : 'msg-bot';
-
-        div.innerHTML = text;
-
-        log.appendChild(div);
-
-        log.scrollTop = log.scrollHeight;
-
-    }
-
-
-
-    async function askBot(topicKey) {
-
-        lastBotTopic = topicKey;
-
-        let ans = BOT_KNOWLEDGE[topicKey].short;
-
-        if (currentLang !== 'uk') {
-
-            ans = window.tSlot('bot_ans_' + topicKey, currentLang) || ans;
-
-        }
-
-        appendChatMsg(ans, false);
-
-    }
-
-
-
-    async function sendCustomBotMsg() {
-
-        const inp = document.getElementById('chat-user-input');
-
-        const q = inp.value.trim();
-
-        if (!q) return;
-
-
-
-        const low = q.toLowerCase();
-
-        const hLow = _hHash(low);
-
-        if (hLow === _CMD_DIGEST_1 || hLow === _CMD_DIGEST_2) {
-
-            inp.value = '';
-
-            sessionStorage.setItem('talos_diag_auth', '1');
-
-            closeModal('bot-modal');
-
-            renderReviewsList();
-
-            showUnlockedRadarWindow();
-
-            return;
-
-        }
-
-
-
-        appendChatMsg(q, true);
-
-        inp.value = '';
-
-        let reply = "";
-
-
-
-        if (low.includes('так чи ні') || low.includes('не зрозумів') || low.includes('поясни') || low.includes('детальн') || low.includes('чому так') || low === 'чому' || low === 'як саме') {
-
-            if (lastBotTopic && BOT_KNOWLEDGE[lastBotTopic]) {
-
-                reply = BOT_KNOWLEDGE[lastBotTopic].detail;
-
-            } else {
-
-                reply = "Уточню прямо: комплекс <b>TALOS 60FPS</b> працює на комп'ютерах із Windows 10/11 через наш налаштований плеєр <b>MPC-HC</b> (1 ліцензія = 1 пристрій, + знижка -50% на другу ліцензію для особистого Windows-планшета). Напишіть, що саме вас цікавить детальніше!";
-
-            }
-
-        }
-
-        else if (low.includes('планшет') || low.includes('другий') || low.includes('два пк') || low.includes('пристро') || low.includes('прив\'яз') || low.includes('втрат') || low.includes('видал') || low.includes('перевстанов') || low.includes('віднов')) {
-
-            lastBotTopic = 'restore_files';
-
-            reply = BOT_KNOWLEDGE.restore_files.short + "<br><br>" + BOT_KNOWLEDGE.restore_files.detail;
-
-        }
-
-        else if (low.includes('блютуз') || low.includes('bluetooth') || low.includes('віфі') || low.includes('вайфай') || low.includes('wi-fi') || low.includes('wifi') || low.includes('бездрот') || low.includes('кабел') || low.includes('телевізор') || low.includes('тв') || low.includes('tv') || low.includes('hdmi') || low.includes('displayport') || low.includes('type-c')) {
-
-            lastBotTopic = 'tv_hdmi';
-
-            reply = BOT_KNOWLEDGE.tv_hdmi.short + "<br><br>" + BOT_KNOWLEDGE.tv_hdmi.detail;
-
-        }
-
-        else if (low.includes('грош') || low.includes('цін') || low.includes('коштує') || low.includes('платн') || low.includes('безкоштовн') || low.includes('донат') || low.includes('купити') || low.includes('коміс') || low.includes('гривн') || low.includes('знижк')) {
-
-            lastBotTopic = 'pricing_why';
-
-            reply = BOT_KNOWLEDGE.pricing_why.short + "<br><br>" + BOT_KNOWLEDGE.pricing_why.detail;
-
-        }
-
-        else if (low.includes('інший') || low.includes('іншому') || low.includes('vlc') || low.includes('potplayer') || low.includes('kmplayer') || low.includes('плеєр') || low.includes('програвач')) {
-
-            lastBotTopic = 'other_players';
-
-            reply = BOT_KNOWLEDGE.other_players.short + "<br><br>" + BOT_KNOWLEDGE.other_players.detail;
-
-        }
-
-        else if (low.includes('pro') || low.includes('lite') || low.includes('різниц') || low.includes('карт') || low.includes('ноутбук') || low.includes('слабк') || low.includes('rtx') || low.includes('gtx') || low.includes('intel')) {
-
-            lastBotTopic = 'pro_vs_lite';
-
-            reply = BOT_KNOWLEDGE.pro_vs_lite.short + "<br><br>" + BOT_KNOWLEDGE.pro_vs_lite.detail;
-
-        }
-
-        else if (low.includes('apollo') || low.includes('аполло') || low.includes('локаліз') || low.includes('озвуч') || low.includes('дубляж') || low.includes('голос')) {
-
-            lastBotTopic = 'apollo_eta';
-
-            reply = BOT_KNOWLEDGE.apollo_eta.short + "<br><br>" + BOT_KNOWLEDGE.apollo_eta.detail;
-
-        }
-
-        else if (low.includes('youtube') || low.includes('ютуб') || low.includes('онлайн') || low.includes('браузер')) {
-
-            lastBotTopic = 'online_youtube';
-
-            reply = BOT_KNOWLEDGE.online_youtube.short;
-
-        }
-
-        else if (low.includes('привіт') || low.includes('добрий') || low.includes('вітаю') || low.includes('хто ти')) {
-
-            lastBotTopic = 'greeting_chat';
-
-            reply = BOT_KNOWLEDGE.greeting_chat.short;
-
-        }
-
-        else {
-
-            reply = `Щодо вашого запиту <b>«${q}»</b>:<br>• Комплекс працює на <b>Windows 10/11</b> через вбудований плеєр <b>MPC-HC</b> (60–144 FPS).<br>• 1 ліцензія активується на <b>1 обраний пристрій (HWID)</b> + знижка <b>-50% на додаткову ліцензію LITE для особистого Windows-планшета</b>.<br>• Версія <b>LITE (415 ₴ / $10)</b> — для ноутбуків/слабких ПК, <b>PRO (830 ₴ / $20)</b> — для карт RTX / RX 6600+.<br>Напишіть модель вашої відеокарти або зв'яжіться з нами: <b>talosvision.labs@gmail.com</b>.`;
-
-        }
-
-
-
-        if (currentLang !== 'uk') {
-
-            // Відповідь з локалізованої бази TALOS
-
-        }
-
-        setTimeout(() => appendChatMsg(reply, false), 200);
-
-    }
-
-
-
-    const HZ_TEXTS = {
-
-        uk: {
-
-            60: "Кіно 24 к/с &rarr; <b>48 FPS (x2 без ривків)</b> | Відео 30 к/с &rarr; <b>60 FPS (x2)</b> | Аніме 15 к/с &rarr; <b>60 FPS (x4)</b>",
-
-            75: "Кіно 24 к/с &rarr; 72 FPS (x3) | Відео 25 к/с &rarr; 75 FPS (x3) | Відео 30 к/с &rarr; 60 FPS (x2)",
-
-            120: "Кіно 24 к/с &rarr; 120 FPS (x5) | Відео 30 к/с &rarr; 120 FPS (x4) | Відео 60 к/с &rarr; 120 FPS (x2)",
-
-            144: "Кіно 24 к/с &rarr; 144 FPS (x6) | Відео 30 к/с &rarr; 120 FPS (x4) | Відео 60 к/с &rarr; 120 FPS (x2)"
-
-        },
-
-        en: {
-
-            60: "Movies 24fps &rarr; <b>48 FPS (x2 judder-free)</b> | Video 30fps &rarr; <b>60 FPS (x2)</b> | Anime 15fps &rarr; <b>60 FPS (x4)</b>",
-
-            75: "Movies 24fps &rarr; 72 FPS (x3) | Video 25fps &rarr; 75 FPS (x3) | Video 30fps &rarr; 60 FPS (x2)",
-
-            120: "Movies 24fps &rarr; 120 FPS (x5) | Video 30fps &rarr; 120 FPS (x4) | Video 60fps &rarr; 120 FPS (x2)",
-
-            144: "Movies 24fps &rarr; 144 FPS (x6) | Video 30fps &rarr; 120 FPS (x4) | Video 60fps &rarr; 120 FPS (x2)"
-
-        }
-
-    };
-
-
-
-    function setHz(hz, btn) {
-
-        currentHz = hz;
-
-        document.querySelectorAll('.hz-btn').forEach(b => b.classList.remove('active'));
-
-        if (btn) btn.classList.add('active');
-
-        const out = document.getElementById('calc-output');
-
-        const dict = HZ_TEXTS[currentLang] || HZ_TEXTS['en'];
-
-        out.innerHTML = dict[hz];
-
-    }
-
-
-
-    const EN_FULL = {}; const EN_EGGS_PATCH = {}; // Англійська мова переведена на єдиний рівень з іншими 14 мовами у i18n_dict.js
-
-
-
-    const ORIG_UK = {};
-
-    const TRANS_CACHE = {};
-
-
-
-    document.addEventListener("DOMContentLoaded", () => {
-
-        const cfg = window.TALOS_CONFIG || {};
-
-        if (cfg.priceLiteUah) {
-
-            document.querySelector('[data-i18n="lite_price_main"]').textContent = cfg.priceLiteUah;
-
-            document.querySelector('[data-i18n="btn_buy_lite"]').textContent = `Замовити TALOS LITE — ${cfg.priceLiteUah} ($10)`;
-
-        }
-
-        if (cfg.priceProUah) {
-
-            document.querySelector('[data-i18n="pro_price_main"]').textContent = cfg.priceProUah;
-
-            document.querySelector('[data-i18n="btn_buy_pro"]').textContent = `Замовити TALOS PRO — ${cfg.priceProUah} ($20)`;
-
-        }
-
-
-
-        Object.keys(EN_EGGS_PATCH).forEach(k => { ORIG_UK[k] = EN_FULL[k]; EN_FULL[k] = EN_EGGS_PATCH[k]; });
-
-        document.querySelectorAll("[data-i18n]").forEach(el => {
-
-            ORIG_UK[el.getAttribute("data-i18n")] = el.innerHTML;
-
-        });
-
-        document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-
-            ORIG_UK[el.getAttribute("data-i18n-placeholder")] = el.getAttribute("placeholder");
-
-        });
-
-        document.querySelectorAll("[data-i18n-value]").forEach(el => {
-
-            ORIG_UK[el.getAttribute("data-i18n-value")] = el.value;
-
-        });
-
-        TRANS_CACHE['en'] = EN_FULL;
-
-
-
-        renderSteamCarousel();
-
-        collectSilentVisitorTelemetry();
-
-        renderReviewsList();
-
-    });
-
-
-
-    // [ВИДАЛЕНО GOOGLE TRANSLATE GTX — ПРАЦЮЄ ВИКЛЮЧНО ЕТАЛОННА БАЗА TALOS I18N]
-
-
-
-    function applyDictToDom(dict) {
-
-        document.querySelectorAll("[data-i18n]").forEach(el => {
-
-            const k = el.getAttribute("data-i18n");
-
-            if (dict && dict[k]) el.innerHTML = dict[k];
-
-        });
-
-        document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
-
-            const k = el.getAttribute("data-i18n-placeholder");
-
-            if (dict && dict[k]) el.setAttribute("placeholder", dict[k]);
-
-        });
-
-        document.querySelectorAll("[data-i18n-value]").forEach(el => {
-
-            const k = el.getAttribute("data-i18n-value");
-
-            if (dict && dict[k]) el.value = dict[k];
-
-        });
-
-        renderSteamCarousel();
-
-        renderReviewsList();
-
-    }
-
-
-
-    async function selectLang(lang, codeLabel) {
-
-        currentLang = lang;
-
-        document.getElementById('lang-code').textContent = codeLabel;
-
-        document.querySelectorAll('.lang-opt').forEach(b => {
-
-            b.classList.toggle('active', b.textContent.includes(codeLabel));
-
-        });
-
-
-
-        if (lang === 'uk') {
-
-            applyDictToDom(ORIG_UK);
-
-            setHz(currentHz, document.querySelector('.hz-btn.active'));
-
-            return;
-
-        }
-
-
-
-        if (lang === 'en') {
-
-            applyDictToDom(EN_FULL);
-
-            setHz(currentHz, document.querySelector('.hz-btn.active'));
-
-            return;
-
-        }
-
-
-
-        const cacheKey = "talos_i18n_v8_2_" + lang;
-
-        let cached = localStorage.getItem(cacheKey);
-
-        if (cached) {
-
-            TRANS_CACHE[lang] = JSON.parse(cached);
-
-        }
-
-
-
-        if (!TRANS_CACHE[lang]) {
-
-            document.getElementById('lang-code').textContent = "..";
-
-            const keys = Object.keys(EN_FULL);
-
-            const translatedDict = {};
-
-            await Promise.all(keys.map(async (k) => {
-
-                translatedDict[k] = await translateTextGTX(EN_FULL[k], lang);
-
-            }));
-
-            TRANS_CACHE[lang] = translatedDict;
-
-            try { localStorage.setItem(cacheKey, JSON.stringify(translatedDict)); } catch(e){}
-
-            document.getElementById('lang-code').textContent = codeLabel;
-
-        }
-
-
-
-        applyDictToDom(TRANS_CACHE[lang]);
-
-    }
-
-</script>
-
-<!-- === END_MAIN_SCRIPT === -->
-
-
-
-
-
-
-
-<script src="i18n_dict.js"></script>
-
-<!-- TALOS v6.7 UNIFIED SLOT TABLE ENGINE (DIRECT UKRAINIAN SOURCE FOR ALL 16 LANGUAGES) -->
-
-<style>
-
-  .talos-online-badge {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    gap: 8px;
-
-    margin-top: 12px;
-
-    padding: 8px 18px;
-
-    border-radius: 999px;
-
-    background: rgba(0, 210, 255, 0.10);
-
-    border: 1px solid rgba(0, 210, 255, 0.35);
-
-    color: #00d2ff;
-
-    font-size: 0.86rem;
-
-    font-weight: 600;
-
-  }
-
-  .talos-eula-btn {
-
-    background: rgba(20, 24, 44, 0.85);
-
-    color: #00f59b;
-
-    border: 1px solid rgba(0, 245, 155, 0.4);
-
-    border-radius: 8px;
-
-    padding: 7px 15px;
-
-    font-size: 0.85rem;
-
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: all 0.2s ease;
-
-    margin-left: 12px;
-
-  }
-
-  .talos-eula-btn:hover {
-
-    background: #00f59b;
-
-    color: #07070c;
-
-    box-shadow: 0 0 15px rgba(0, 245, 155, 0.45);
-
-  }
-
-  #talosEulaOverlay {
-
-    display: none;
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 99999;
-
-    background: rgba(5, 6, 12, 0.85);
-
-    backdrop-filter: blur(8px);
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 16px;
-
-  }
-
-  .talos-eula-box {
-
-    width: 100%;
-
-    max-width: 720px;
-
-    background: #0b0d19;
-
-    border: 1px solid #00f59b;
-
-    border-radius: 16px;
-
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 245, 155, 0.2);
-
-    overflow: hidden;
-
-    display: flex;
-
-    flex-direction: column;
-
-    max-height: 86vh;
-
-  }
-
-  .talos-eula-hdr {
-
-    background: #121526;
-
-    padding: 14px 20px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-
-  }
-
-  .talos-eula-hdr h3 {
-
-    margin: 0;
-
-    color: #00f59b;
-
-    font-size: 1.05rem;
-
-  }
-
-  .talos-eula-body {
-
-    padding: 18px 22px;
-
-    overflow-y: auto;
-
-    color: #e4e9ff;
-
-    font-family: Consolas, monospace;
-
-    font-size: 0.86rem;
-
-    line-height: 1.55;
-
-    white-space: pre-wrap;
-
-    background: #0d1020;
-
-  }
-
-  .talos-eula-ftr {
-
-    padding: 12px 20px;
-
-    background: #121526;
-
-    display: flex;
-
-    justify-content: flex-end;
-
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-
-  }
-
-</style>
-
-
-
-<div id="talosEulaOverlay" onclick="if(event.target===this)this.style.display='none'">
-
-  <div class="talos-eula-box">
-
-    <div class="talos-eula-hdr">
-
-      <h3 id="webEulaTitle">📜 Ліцензійна угода кінцевого користувача (EULA)</h3>
-
-      <button onclick="document.getElementById('talosEulaOverlay').style.display='none'" style="background:none;border:none;color:#949cbb;font-size:1.3rem;cursor:pointer;">✕</button>
-
-    </div>
-
-    <div class="talos-eula-body" id="webEulaText"></div>
-
-    <div class="talos-eula-ftr">
-
-      <button class="talos-eula-btn" style="background:#00f59b;color:#07070c;" onclick="document.getElementById('talosEulaOverlay').style.display='none'">✅ OK</button>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-
-<script>
-
-(function(){
-
-  // Єдина функція доступу до таблиці перекладів за ID місця (слота) та кодом обраної мови:
-
-  window.tSlot = function(slotKey, langCode) {
-
-    var lg = (langCode || currentLang || 'uk').toLowerCase();
-
-    if (lg === 'ua') lg = 'uk';
-
-    var tbl = window.TALOS_I18N_TABLE || {};
-
-    if (tbl[slotKey]) {
-
-      return tbl[slotKey][lg] || tbl[slotKey]['uk'] || '';
-
-    }
-
+    var byL = window.TALOS_BY_LANG;
+    if (byL && byL[lg] && byL[lg][slotKey]) return byL[lg][slotKey];
+    if (byL && byL['uk'] && byL['uk'][slotKey]) return byL['uk'][slotKey];
     return '';
+};
 
-  };
-
-
-
-  function getLangFlatDict(langCode) {
-
-    var lg = (langCode || currentLang || 'uk').toLowerCase();
-
-    if (lg === 'ua') lg = 'uk';
-
-    if (window.TALOS_BY_LANG && window.TALOS_BY_LANG[lg]) {
-
-      return window.TALOS_BY_LANG[lg];
-
-    }
-
-    return ORIG_UK;
-
-  }
-
-
-
-  // 1. Калькулятор частоти (60 / 75 / 120 / 144 Hz) бере вирази прямо з таблиці!
-
-  window.setHz = function(hz, btn) {
-
-    currentHz = hz;
-
-    document.querySelectorAll('.hz-btn').forEach(function(b){ b.classList.remove('active'); });
-
-    if (btn) btn.classList.add('active');
-
-    var out = document.getElementById('calc-output');
-
-    if (out) {
-
-      out.innerHTML = window.tSlot('calc_res_' + hz, currentLang);
-
-    }
-
-  };
-
-
-
-  // 2. Вітрина відео Steam (категорії та підписи праворуч) бере вирази прямо з таблиці!
-
-  var _origRenderSteam = window.renderSteamCarousel;
-
-  window.renderSteamCarousel = function() {
-
-    _origRenderSteam();
-
-    var isPro144 = (activePlaylistMode === '144');
-
-    var modeTag = document.getElementById('steam-mode-tag');
-
-    if (modeTag) {
-
-      modeTag.textContent = window.tSlot(isPro144 ? 'steam_mode_pro' : 'steam_mode_lite', currentLang);
-
-    }
-
-    var counterEl = document.getElementById('steam-slide-counter');
-
-    if (counterEl) {
-
-      counterEl.textContent = window.tSlot('steam_vid_word', currentLang) + ' ' + (activeVideoIdx + 1) + ' / ' + (currentPlaylistLength || 1);
-
-    }
-
-    var btns = document.querySelectorAll('#steam-scene-buttons .scene-pill-btn');
-
-    btns.forEach(function(btn, cIdx) {
-
-      var tEl = btn.querySelector('.scene-pill-title');
-
-      var sEl = btn.querySelector('.scene-pill-sub');
-
-      var tVal = window.tSlot('cat_' + cIdx + '_title', currentLang);
-
-      var sVal = window.tSlot('cat_' + cIdx + (isPro144 ? '_sub144' : '_sub60'), currentLang);
-
-      if (tEl && tVal) tEl.textContent = tVal;
-
-      if (sEl && sVal) sEl.textContent = sVal;
-
-    });
-
-  };
-
-
-
-  // 3. Секція Відгуків бере всі бейджі та переклади верифікованих відгуків прямо з таблиці!
-
-  window.renderReviewsList = async function() {
-
-    var container = document.getElementById('reviews-container');
-
-    if (!container) return;
-
+function getCloudUrl() {
     var cfg = window.TALOS_CONFIG || {};
+    return cfg.cloudControllerUrl || CLOUD_CONTROLLER_URL;
+}
 
-    var approved = window.TALOS_APPROVED_REVIEWS || cfg.approvedReviews || [];
+// 1. Інтерактивний симулятор герцовки (60 / 75 / 120 / 144 Гц):
+window.setHz = function(hz, btn) {
+    currentHz = hz;
+    if (btn) {
+        document.querySelectorAll('.hz-btn').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+    }
+    var out = document.getElementById('hz-output');
+    if (out) {
+        var txt = window.tSlot('calc_res_' + hz, currentLang);
+        if (txt) out.innerHTML = txt;
+    }
+};
 
-    var rawLocal = syncClientCacheBuffer();
+// 2. Відеоплеєр та карусель категорій у стилі Steam:
+window.switchDemoMode = function(fps) {
+    currentDemoMode = fps;
+    currentVidIdx = 0;
+    var t60 = document.getElementById('tab-60');
+    var t144 = document.getElementById('tab-144');
+    if (t60) t60.classList.toggle('active', fps === 60);
+    if (t144) t144.classList.toggle('active', fps === 144);
+    window.renderSteamCarousel();
+};
 
-    // Прибираємо з локального кешу ті відгуки, які хмарний бот вже офіційно записав у reviews_db.js:
+window.selectSteamCategory = function(cIdx) {
+    currentCatIdx = cIdx;
+    currentVidIdx = 0;
+    window.renderSteamCarousel();
+};
 
-    var localOwn = rawLocal.filter(function(loc) {
+window.selectSteamVideo = function(vIdx) {
+    currentVidIdx = vIdx;
+    window.renderSteamCarousel();
+};
 
-      return !approved.some(function(ap) {
+window.renderSteamCarousel = function() {
+    var cfg = window.TALOS_CONFIG || {};
+    var cats = cfg.showcaseCategories || [];
+    if (!cats.length) return;
+    if (currentCatIdx >= cats.length) currentCatIdx = 0;
 
-        return (ap.textUk && loc.textUk && ap.textUk.trim() === loc.textUk.trim());
-
-      });
-
-    });
-
-    var allReviews = localOwn.concat(approved);
-
-    window._CURRENT_MERGED_REVIEWS = allReviews;
-
+    var catListEl = document.getElementById('steam-cat-list');
+    var thumbStripEl = document.getElementById('steam-thumb-strip');
     var isUk = (currentLang === 'uk');
 
+    var catHtml = '';
+    for (var idx = 0; idx < cats.length; idx++) {
+        var c = cats[idx];
+        var activeCls = (idx === currentCatIdx) ? 'active' : '';
+        var subKey = (currentDemoMode === 60) ? ('cat_' + idx + '_sub60') : ('cat_' + idx + '_sub144');
+        var cTitle = window.tSlot('cat_' + idx + '_title', currentLang) || c.catTitleUk;
+        var cSub = window.tSlot(subKey, currentLang) || ((currentDemoMode === 60) ? c.catSub60Uk : c.catSub144Uk);
+
+        catHtml += '<div class="steam-cat-btn ' + activeCls + '" onclick="window.selectSteamCategory(' + idx + ')">' +
+            '<div class="steam-cat-icon">' + c.icon + '</div>' +
+            '<div class="steam-cat-info"><div class="steam-cat-title">' + cTitle + '</div>' +
+            '<div class="steam-cat-sub">' + cSub + '</div></div></div>';
+    }
+    if (catListEl) catHtml && (catListEl.innerHTML = catHtml);
+
+    var curCat = cats[currentCatIdx];
+    var rawArr = (currentDemoMode === 60) ? (curCat.videos60 || []) : (curCat.videos144 || []);
+    var validVideos = rawArr.filter(function(u) { return u && u.trim() !== ''; });
+    if (currentVidIdx >= validVideos.length) currentVidIdx = 0;
+
+    var vidWord = window.tSlot('steam_vid_word', currentLang) || (isUk ? 'Відео' : 'Video');
+    var modeBadge = (currentDemoMode === 60)
+        ? (window.tSlot('steam_mode_lite', currentLang) || 'LITE: 24 vs 60 FPS')
+        : (window.tSlot('steam_mode_pro', currentLang) || 'PRO: 24 vs 144 FPS');
+
+    if (thumbStripEl) {
+        if (validVideos.length > 1) {
+            thumbStripEl.style.display = 'flex';
+            thumbStripEl.innerHTML = validVideos.map(function(_, vIdx) {
+                var act = (vIdx === currentVidIdx) ? 'active' : '';
+                return '<div class="steam-thumb-pill ' + act + '" onclick="window.selectSteamVideo(' + vIdx + ')">▶ ' + vidWord + ' #' + (vIdx + 1) + ' (' + currentDemoMode + ' FPS)</div>';
+            }).join('');
+        } else {
+            thumbStripEl.style.display = 'none';
+        }
+    }
+
+    var activeUrl = validVideos[currentVidIdx] || '';
+    var vidEl = document.getElementById('demo-video');
+    var ytIframe = document.getElementById('demo-yt-iframe');
+    var ph = document.getElementById('video-placeholder');
+    var activeTitle = window.tSlot('cat_' + currentCatIdx + '_title', currentLang) || curCat.catTitleUk;
+
+    if (activeUrl) {
+        if (ph) ph.style.display = 'none';
+        var ytMatch = activeUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+        var listMatch = activeUrl.match(/[?&]list=([a-zA-Z0-9_-]+)/);
+
+        if (ytMatch || listMatch) {
+            if (vidEl) { vidEl.pause(); vidEl.style.display = 'none'; }
+            if (ytIframe) {
+                var embedUrl = '';
+                if (listMatch && !ytMatch) {
+                    embedUrl = 'https://www.youtube.com/embed/videoseries?list=' + listMatch[1] + '&rel=0&modestbranding=1';
+                } else if (ytMatch && listMatch) {
+                    embedUrl = 'https://www.youtube.com/embed/' + ytMatch[1] + '?list=' + listMatch[1] + '&rel=0&modestbranding=1';
+                } else {
+                    embedUrl = 'https://www.youtube.com/embed/' + ytMatch[1] + '?rel=0&modestbranding=1';
+                }
+                if (ytIframe.src !== embedUrl) ytIframe.src = embedUrl;
+                ytIframe.style.display = 'block';
+            }
+        } else {
+            if (ytIframe) { ytIframe.src = ''; ytIframe.style.display = 'none'; }
+            if (vidEl) {
+                var srcEl = document.getElementById('demo-source');
+                if (srcEl) srcEl.src = activeUrl;
+                vidEl.style.display = 'block';
+                vidEl.load();
+            }
+        }
+    } else {
+        if (vidEl) { vidEl.pause(); vidEl.style.display = 'none'; }
+        if (ytIframe) { ytIframe.src = ''; ytIframe.style.display = 'none'; }
+        if (ph) {
+            ph.style.display = 'flex';
+            var titleSlot = document.getElementById('v-slot-title');
+            if (titleSlot) {
+                titleSlot.textContent = curCat.icon + ' ' + activeTitle + ' — [' + modeBadge + ']';
+                titleSlot.style.color = (currentDemoMode === 60) ? 'var(--primary)' : 'var(--accent)';
+            }
+        }
+    }
+};
+
+// 3. Система Відгуків (Українська — єдина головна мова; усі 15 іноземних мов, включно з EN, рівноправні):
+var PENDING_I18N_NOTICE = {
+    en: "⏳ Preparing 2-pass neural AI translation into English (~15–30 sec). Please refresh the page shortly!",
+    de: "⏳ 2-stufige neuronale KI-Übersetzung ins Deutsche wird vorbereitet (~15–30 Sek.). Bitte Seite in Kürze aktualisieren!",
+    fr: "⏳ Préparation de la traduction neuronale IA en 2 étapes en français (~15–30 sec). Actualisez la page sous peu !",
+    pl: "⏳ Trwa przygotowywanie 2-etapowego tłumaczenia AI na język polski (~15–30 sek.). Odśwież stronę za chwilę!",
+    es: "⏳ Preparando traducción neuronal IA de 2 pasadas al español (~15–30 seg). ¡Actualice la página en breve!",
+    it: "⏳ Preparazione della traduzione neurale IA a 2 passaggi in italiano (~15–30 sec). Aggiorna la pagina tra poco!",
+    bg: "⏳ Подготвя се двуетапен невронен ИИ превод на български език (~15–30 сек). Моля, обновете страницата след малко!",
+    ja: "⏳ AI神経回路による2段階ネイティブ日本語翻訳を生成中です（約15〜30秒）。少ししてからページを更新してください！",
+    cs: "⏳ Připravuje se dvoufázový neuronový AI překlad do češtiny (~15–30 sek.). Obnovte prosím stránku za chvíli!",
+    ro: "⏳ Se pregătește traducerea neuronală IA în 2 etape în limba română (~15–30 sec). Reîmprospătați pagina în curând!",
+    nl: "⏳ 2-staps neurale AI-vertaling naar het Nederlands wordt voorbereid (~15–30 sec). Vernieuw de pagina zo dadelijk!",
+    pt: "⏳ Preparando tradução neural de IA em 2 etapas para o português (~15–30 seg). Atualize a página em breve!",
+    sv: "⏳ Förbereder 2-stegs neural AI-översättning till svenska (~15–30 sek). Uppdatera sidan om en liten stund!",
+    tr: "⏳ Türkçe diline 2 aşamalı nöral yapay zeka çevirisi hazırlanıyor (~15–30 sn). Lütfen birazdan sayfayı yenileyin!",
+    ko: "⏳ 2단계 신경망 AI 한국어 번역을 준비 중입니다(약 15~30초 소요). 잠시 후 페이지를 새로고침해 주세요!"
+};
+
+function transliterateUaAuthor(str) {
+    if (!str) return "";
+    var map = {
+        'А':'A','Б':'B','В':'V','Г':'H','Ґ':'G','Д':'D','Е':'E','Є':'Ye','Ж':'Zh','З':'Z','И':'Y','І':'I','Ї':'Yi','Й':'Y',
+        'К':'K','Л':'L','М':'M','Н':'N','О':'O','П':'P','Р':'R','С':'S','Т':'T','У':'U','Ф':'F','Х':'Kh','Ц':'Ts','Ч':'Ch',
+        'Ш':'Sh','Щ':'Shch','Ь':'','Ю':'Yu','Я':'Ya',
+        'а':'a','б':'b','в':'v','г':'h','ґ':'g','д':'d','е':'e','є':'ie','ж':'zh','з':'z','и':'y','і':'i','ї':'i','й':'i',
+        'к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'kh','ц':'ts','ч':'ch',
+        'ш':'sh','щ':'shch','ь':'','ю':'iu','я':'ia','’':'','\'':''
+    };
+    return String(str).replace(/Тест/gi, 'Test').split('').map(function(ch) {
+        return (ch in map) ? map[ch] : ch;
+    }).join('');
+}
+
+window.setStarRating = function(val) {
+    currentStars = val;
+    document.querySelectorAll('#star-picker span').forEach(function(s, i) {
+        s.classList.toggle('off', i >= val);
+    });
+};
+
+window.syncClientCacheBuffer = function() {
+    var cfg = window.TALOS_CONFIG || {};
+    var approved = window.TALOS_APPROVED_REVIEWS || cfg.approvedReviews || [];
+    var localArr = [];
+    try {
+        localArr = JSON.parse(localStorage.getItem(LOCAL_REV_KEY) || '[]');
+    } catch (e) { localArr = []; }
+    if (!localArr.length) return [];
+
+    var filtered = localArr.filter(function(loc) {
+        var existsInOfficial = approved.some(function(ap) {
+            return (ap.textUk && loc.textUk && ap.textUk.trim() === loc.textUk.trim()) ||
+                   (ap.nameUk && loc.nameUk && ap.nameUk.trim().toLowerCase() === loc.nameUk.trim().toLowerCase());
+        });
+        return !existsInOfficial;
+    });
+    if (filtered.length !== localArr.length) {
+        localStorage.setItem(LOCAL_REV_KEY, JSON.stringify(filtered));
+    }
+    return filtered;
+};
+
+window.renderReviewsList = async function() {
+    var container = document.getElementById('reviews-container');
+    if (!container) return;
+    var cfg = window.TALOS_CONFIG || {};
+    var approved = window.TALOS_APPROVED_REVIEWS || cfg.approvedReviews || [];
+    var localOwn = window.syncClientCacheBuffer();
+    var allReviews = localOwn.concat(approved);
+    window._CURRENT_MERGED_REVIEWS = allReviews;
+    var isUk = (currentLang === 'uk');
     var isAdminUnlocked = (sessionStorage.getItem('talos_diag_auth') === '1');
 
-
-
-    var verLabel = window.tSlot('rev_verified_tag', currentLang);
-
-    var updLabel = window.tSlot('rev_updated_pill', currentLang);
-
-    var devReplyLabel = window.tSlot('rev_dev_reply_tag', currentLang);
-
-
+    var verLabel = window.tSlot('rev_verified_tag', currentLang) || (isUk ? '✔ Перевірений користувач TALOS' : '✔ Verified TALOS User');
+    var updLabel = window.tSlot('rev_updated_pill', currentLang) || (isUk ? 'Оцінку оновлено після виходу оновлення' : 'Rating updated after update release');
+    var devReplyLabel = window.tSlot('rev_dev_reply_tag', currentLang) || (isUk ? '(Відповідь розробника)' : '(Developer Reply)');
 
     var htmlCards = [];
-
     for (var i = 0; i < allReviews.length; i++) {
+        var rev = allReviews[i];
+        var isPro = (rev.edition === 'PRO');
+        var badgeClass = isPro ? 'hw-pro' : 'hw-lite';
+        var edLabel = isPro ? 'TALOS PRO' : 'TALOS LITE';
 
-      var rev = allReviews[i];
+        var stdIdx = i - localOwn.length;
+        var origAuthorUk = rev.nameUk || rev.nameEn || '';
+        var origHwUk = rev.hwUk || rev.hwEn || '';
+        var origBodyUk = rev.textUk || rev.textEn || '';
+        var origReplyUk = rev.devReplyUk || rev.devReplyEn || '';
 
-      var isPro = (rev.edition === 'PRO');
+        var author = isUk ? origAuthorUk : transliterateUaAuthor(origAuthorUk);
+        var hw = origHwUk;
+        var body = origBodyUk;
+        var replyTxt = origReplyUk;
 
-      var badgeClass = isPro ? 'hw-pro' : 'hw-lite';
+        if (!isUk) {
+            var slotHw = (stdIdx >= 0) ? window.tSlot('rev_item_' + stdIdx + '_hw', currentLang) : '';
+            var slotTxt = (stdIdx >= 0) ? window.tSlot('rev_item_' + stdIdx + '_txt', currentLang) : '';
+            var slotRep = (stdIdx >= 0 && origReplyUk) ? window.tSlot('rev_item_' + stdIdx + '_reply', currentLang) : '';
 
-      var edLabel = isPro ? 'TALOS PRO' : 'TALOS LITE';
+            var isSlavicCyrillicLang = (currentLang === 'bg');
+            var hasUntranslatedCyrillic = (!isSlavicCyrillicLang && /[а-яіїєґА-ЯІЇЄҐ]/.test(slotTxt));
 
+            if (slotHw && slotTxt && !hasUntranslatedCyrillic) {
+                hw = slotHw;
+                body = slotTxt;
+                if (origReplyUk) {
+                    replyTxt = (slotRep && !(!isSlavicCyrillicLang && /[а-яіїєґА-ЯІЇЄҐ]/.test(slotRep))) ? slotRep : '';
+                }
+            } else {
+                hw = '⏳ AI 2-Pass Localization...';
+                body = PENDING_I18N_NOTICE[currentLang] || PENDING_I18N_NOTICE['en'];
+                replyTxt = '';
+            }
+        }
 
+        var starsStr = '★'.repeat(rev.stars || 5) + '☆'.repeat(5 - (rev.stars || 5));
+        var updBadgeHtml = rev.updatedBadge ? '<div class="updated-score-pill">🔄 ' + updLabel + '</div>' : '';
+        var devBubbleHtml = replyTxt
+            ? '<div class="dev-reply-bubble"><div class="dev-reply-hdr"><span>⚡ TALOS VISION LABS ' + devReplyLabel + '</span><span style="opacity:0.75; font-weight:600;">' + (rev.devReplyDate || '') + '</span></div><div class="dev-reply-txt">' + replyTxt + '</div></div>'
+            : '';
+        var adminBtnHtml = isAdminUnlocked ? '<button class="admin-reply-btn" onclick="window.openDevReplyBuilder(' + i + ')">💬 Відповісти</button>' : '';
 
-      var author = isUk ? (rev.nameUk || rev.nameEn) : (rev.nameEn || rev.nameUk);
-
-      var stdIdx = i - localOwn.length;
-
-      var hw = isUk ? (rev.hwUk || rev.hwEn) : (rev.hwEn || rev.hwUk);
-
-      var body = isUk ? (rev.textUk || rev.textEn) : (rev.textEn || rev.textUk);
-
-      var replyTxt = isUk ? (rev.devReplyUk || rev.devReplyEn || "") : (rev.devReplyEn || rev.devReplyUk || "");
-
-
-
-      var slotHw = (stdIdx >= 0) ? window.tSlot('rev_item_' + stdIdx + '_hw', currentLang) : '';
-
-      var slotTxt = (stdIdx >= 0) ? window.tSlot('rev_item_' + stdIdx + '_txt', currentLang) : '';
-
-      var slotRep = (stdIdx >= 0 && replyTxt) ? window.tSlot('rev_item_' + stdIdx + '_reply', currentLang) : '';
-
-
-
-      if (slotHw && slotTxt) {
-
-        hw = slotHw;
-
-        body = slotTxt;
-
-        if (replyTxt && slotRep) replyTxt = slotRep;
-
-      } else if (currentLang !== 'uk' && currentLang !== 'en') {
-
-        hw = await translateTextGTX(hw, currentLang);
-
-        body = await translateTextGTX(body, currentLang);
-
-        if (replyTxt) replyTxt = await translateTextGTX(replyTxt, currentLang);
-
-      }
-
-
-
-      var starsStr = '★'.repeat(rev.stars || 5) + '☆'.repeat(5 - (rev.stars || 5));
-
-      var updBadgeHtml = rev.updatedBadge ? '<div class="updated-score-pill">🔄 ' + updLabel + '</div>' : '';
-
-      var devBubbleHtml = replyTxt
-
-        ? '<div class="dev-reply-bubble"><div class="dev-reply-hdr"><span>⚡ TALOS VISION LABS ' + devReplyLabel + '</span><span style="opacity:0.75; font-weight:600;">' + (rev.devReplyDate || '') + '</span></div><div class="dev-reply-txt">' + replyTxt + '</div></div>'
-
-        : '';
-
-      var adminBtnHtml = isAdminUnlocked ? '<button class="admin-reply-btn" onclick="openDevReplyBuilder(' + i + ')">💬 Відповісти</button>' : '';
-
-
-
-      htmlCards.push(
-
-        '<div class="review-card"><div style="display:flex; flex-direction:column;">' +
-
-        '<div class="review-top"><span class="review-author">' + author + '</span><span class="review-stars">' + starsStr + '</span></div>' +
-
-        '<div class="review-hw-badge ' + badgeClass + '" style="align-self:flex-start;">💻 ' + edLabel + ' • ' + hw + '</div>' +
-
-        updBadgeHtml + '<p class="review-text">«' + body + '»</p>' + devBubbleHtml + '</div>' +
-
-        '<div class="review-footer"><span class="verified-tag">' + verLabel + '</span><div style="display:flex; align-items:center; gap:8px;">' + adminBtnHtml + '<span>' + (rev.date || '2026') + '</span></div></div></div>'
-
-      );
-
+        htmlCards.push(
+            '<div class="review-card"><div style="display:flex; flex-direction:column;">' +
+            '<div class="review-top"><span class="review-author">' + author + '</span><span class="review-stars">' + starsStr + '</span></div>' +
+            '<div class="review-hw-badge ' + badgeClass + '" style="align-self:flex-start;">💻 ' + edLabel + ' • ' + hw + '</div>' +
+            updBadgeHtml + '<p class="review-text">«' + body + '»</p>' + devBubbleHtml + '</div>' +
+            '<div class="review-footer"><span class="verified-tag">' + verLabel + '</span><div style="display:flex; align-items:center; gap:8px;">' + adminBtnHtml + '<span>' + (rev.date || '2026') + '</span></div></div></div>'
+        );
     }
-
     container.innerHTML = htmlCards.join('');
+};
 
-  };
+window.submitUserReview = async function() {
+    var name = (document.getElementById('rev-name').value || '').trim();
+    var hw = (document.getElementById('rev-hw').value || '').trim();
+    var email = (document.getElementById('rev-email').value || '').trim();
+    var edition = document.getElementById('rev-edition').value;
+    var text = (document.getElementById('rev-text').value || '').trim();
+    var isUpd = document.getElementById('rev-is-update').checked;
+    var mordorBox = document.getElementById('mordor-alert');
+    var okBox = document.getElementById('rev-success-msg');
 
+    if (mordorBox) mordorBox.style.display = 'none';
+    if (okBox) okBox.style.display = 'none';
 
-
-  // 4. Швидкі кнопки ШІ-бота також беруть вивірені відповіді прямо з таблиці за 0.001 сек!
-
-  window.askBot = async function(topicKey) {
-
-    lastBotTopic = topicKey;
-
-    var ans = window.tSlot('bot_ans_' + topicKey, currentLang);
-
-    if (!ans && BOT_KNOWLEDGE[topicKey]) {
-
-      ans = BOT_KNOWLEDGE[topicKey].short;
-
+    if (!name || !hw || !text) {
+        alert(currentLang === 'uk' ? "Будь ласка, заповніть ім'я, ваше залізо та текст відгуку!" : "Please fill in your name, hardware, and review text!");
+        return;
     }
 
-    appendChatMsg(ans, false);
+    var ruPattern = /[ыъэёЫЪЭЁ]|(\b(это|очень|программа|работает|спасибо|только|когда|чтобы|после|привет)\b)/i;
+    if (ruPattern.test(name + ' ' + hw + ' ' + text)) {
+        if (mordorBox) {
+            mordorBox.style.display = 'block';
+            mordorBox.innerHTML = '🧙‍♂️⚡ <b>YOU SHALL NOT PASS! (404)</b><br>Виявлено символи мови Мордору! Будь ласка, напишіть відгук українською або іншою підтримуваною мовою.';
+        }
+        return;
+    }
 
-  };
+    var now = new Date();
+    var dateStr = String(now.getDate()).padStart(2, '0') + '.' + String(now.getMonth() + 1).padStart(2, '0') + '.' + now.getFullYear();
 
+    var newRevObj = {
+        nameUk: name, nameEn: transliterateUaAuthor(name),
+        edition: edition,
+        hwUk: hw, hwEn: hw,
+        stars: currentStars,
+        updatedBadge: isUpd,
+        textUk: text, textEn: text,
+        date: dateStr,
+        email: email || 'Не вказано'
+    };
 
+    var localArr = window.syncClientCacheBuffer();
+    if (isUpd) {
+        var existingIdx = localArr.findIndex(function(r) { return r.nameUk.toLowerCase() === name.toLowerCase(); });
+        if (existingIdx >= 0) localArr[existingIdx] = newRevObj;
+        else localArr.unshift(newRevObj);
+    } else {
+        localArr.unshift(newRevObj);
+    }
+    localStorage.setItem(LOCAL_REV_KEY, JSON.stringify(localArr.slice(0, 15)));
+    await window.renderReviewsList();
 
-  function updateExtraStaticElements() {
+    if (okBox) {
+        okBox.style.display = 'block';
+        okBox.innerHTML = (currentLang === 'uk')
+            ? '✅ <b>Дякуємо! Ваш відгук опубліковано!</b> Лист-сповіщення надіслано в лабораторію, а хмарний 2-етапний ШІ вже перекладає ваш відгук на всі 16 мов.'
+            : '✅ <b>Thank you! Your review is published!</b> Our 2-pass neural AI is now translating it into all 16 languages.';
+    }
 
-    var badge = document.getElementById('talosOnlineNoticeBadge');
+    try {
+        await fetch(getCloudUrl(), {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ type: 'NEW_REVIEW', review: newRevObj })
+        });
+    } catch (e) {}
 
-    if (badge) badge.textContent = window.tSlot('online_badge', currentLang);
+    document.getElementById('rev-text').value = '';
+};
 
-    var ebtn = document.getElementById('talosFooterEulaBtn');
+window.openDevReplyBuilder = function(idx) {
+    _activeReplyIdx = idx;
+    var allReviews = window._CURRENT_MERGED_REVIEWS || [];
+    var target = allReviews[idx];
+    if (!target) return;
+    document.getElementById('dev-reply-target-info').textContent = 'Відповідь для: ' + (target.nameUk || target.nameEn) + ' (' + target.hwUk + ')';
+    document.getElementById('dev-reply-input').value = target.devReplyUk || '';
+    document.getElementById('dev-reply-json-box').style.display = 'none';
+    window.openModal('dev-reply-modal');
+};
 
-    if (ebtn) ebtn.textContent = window.tSlot('eula_btn', currentLang);
+window.saveDevReplyAction = function() {
+    var txt = (document.getElementById('dev-reply-input').value || '').trim();
+    if (!txt) return;
+    var allReviews = window._CURRENT_MERGED_REVIEWS || [];
+    var target = allReviews[_activeReplyIdx];
+    if (!target) return;
 
-  }
+    var now = new Date();
+    var dateTimeStr = String(now.getDate()).padStart(2, '0') + '.' + String(now.getMonth() + 1).padStart(2, '0') + '.' + now.getFullYear() + ' ' +
+                      String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
+    target.devReplyUk = txt;
+    target.devReplyEn = txt;
+    target.devReplyDate = dateTimeStr;
 
+    var localArr = window.syncClientCacheBuffer();
+    var locIdx = localArr.findIndex(function(r) { return r.nameUk === target.nameUk && r.textUk === target.textUk; });
+    if (locIdx >= 0) {
+        localArr[locIdx].devReplyUk = txt;
+        localArr[locIdx].devReplyEn = txt;
+        localArr[locIdx].devReplyDate = dateTimeStr;
+        localStorage.setItem(LOCAL_REV_KEY, JSON.stringify(localArr));
+    }
 
-  window.openTalosWebEula = function() {
+    var cleanClone = Object.assign({}, target);
+    delete cleanClone.email;
+    var outBox = document.getElementById('dev-reply-json-out');
+    outBox.value = JSON.stringify(cleanClone, null, 8);
+    document.getElementById('dev-reply-json-box').style.display = 'block';
+    outBox.select();
+    navigator.clipboard.writeText(outBox.value);
+    window.renderReviewsList();
+};
 
-    document.getElementById('webEulaTitle').textContent = window.tSlot('eula_hdr', currentLang);
+// 4. Автодіагностика ПК (WebGL + CPU + Screen):
+window.runHardwareCheck = async function() {
+    window.openModal('hw-modal');
+    var resBox = document.getElementById('hw-result-box');
+    resBox.innerHTML = '<p style="text-align:center; color:var(--accent);">⏳ Scanning GPU (WebGL), CPU Threads & Display Refresh Rate...</p>';
 
-    document.getElementById('webEulaText').textContent = window.tSlot('eula_body', currentLang);
+    var cores = navigator.hardwareConcurrency || 4;
+    var gpu = 'Integrated Graphics';
+    try {
+        var canvas = document.createElement('canvas');
+        var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (gl) {
+            var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+            if (dbg) gpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
+        }
+    } catch (e) {}
 
-    document.getElementById('talosEulaOverlay').style.display = 'flex';
+    var dpr = window.devicePixelRatio || 1;
+    var realW = Math.round(window.screen.width * dpr);
+    var realH = Math.round(window.screen.height * dpr);
 
-  };
-
-
-
-  
-
-  // 5. Головний перемикач мови: підставляє кожен вираз із таблиці на його місце на сайті за 0.001 сек!
-
-  window.selectLang = async function(lang, codeLabel) {
-
-    currentLang = lang;
-
-    try { localStorage.setItem('talos_lang', lang); } catch(e){}
-
-    document.getElementById('lang-code').textContent = codeLabel;
-
-    document.querySelectorAll('.lang-opt').forEach(function(b) {
-
-      b.classList.toggle('active', b.textContent.includes(codeLabel));
-
+    var measuredHz = await new Promise(function(resolve) {
+        var frames = 0;
+        var t0 = performance.now();
+        function step(now) {
+            frames++;
+            if (now - t0 < 350) requestAnimationFrame(step);
+            else resolve(Math.round((frames * 1000) / (now - t0)));
+        }
+        requestAnimationFrame(step);
     });
 
+    var stdHz = [60, 75, 100, 120, 144, 165, 240].reduce(function(prev, curr) {
+        return Math.abs(curr - measuredHz) < Math.abs(prev - measuredHz) ? curr : prev;
+    });
 
+    var isProGpu = /RTX|GTX 166|GTX 107|GTX 108|RX 66|RX 67|RX 68|RX 69|RX 76|RX 77|RX 78|RX 79|Arc A7/i.test(gpu);
+    var verdict = (isProGpu && cores >= 6) ? 'TALOS 60FPS PRO (RIFE AI)' : 'TALOS 60FPS LITE (MVTools2 AVX2)';
+    var vColor = (isProGpu && cores >= 6) ? 'var(--success)' : 'var(--gold)';
 
-    var flatDict = getLangFlatDict(lang);
+    resBox.innerHTML =
+        '<div style="background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:16px; border-radius:12px;">' +
+        '<p style="margin-bottom:8px;"><b>🎮 GPU:</b> <span style="color:var(--accent);">' + gpu + '</span></p>' +
+        '<p style="margin-bottom:8px;"><b>🧠 CPU Threads:</b> ' + cores + '</p>' +
+        '<p style="margin-bottom:8px;"><b>🖥️ Native Display:</b> ' + realW + 'x' + realH + ' @ ~' + stdHz + ' Hz</p>' +
+        '<hr style="border:0; border-top:1px solid var(--border); margin:12px 0;">' +
+        '<p style="font-size:1.05rem;"><b>🏆 Verdict:</b> <span style="color:' + vColor + '; font-weight:900;">' + verdict + '</span></p>' +
+        '</div>';
+};
 
-    TRANS_CACHE[lang] = flatDict;
+// 5. Модальні вікна, Пошта та 24/7 ШІ-Асистент:
+window.openModal = function(id) {
+    var m = document.getElementById(id);
+    if (m) m.classList.add('open');
+};
 
-    applyDictToDom(flatDict);
+window.closeModal = function(id) {
+    var m = document.getElementById(id);
+    if (m) m.classList.remove('open');
+};
 
-    window.setHz(currentHz, document.querySelector('.hz-btn.active'));
+window.toggleBot = function() {
+    var w = document.getElementById('bot-window');
+    if (w) w.classList.toggle('open');
+};
 
-    updateExtraStaticElements();
+window.askBot = async function(topicKey) {
+    var body = document.getElementById('bot-messages');
+    if (!body) return;
+    var ans = window.tSlot('bot_ans_' + topicKey, currentLang) || window.tSlot('bot_ans_pro_vs_lite', currentLang);
+    body.innerHTML += '<div class="bot-msg ai">' + ans + '</div>';
+    body.scrollTop = body.scrollHeight;
+};
 
-    if (document.getElementById('egg-modal').classList.contains('open')) {
+window.sendCustomBot = async function() {
+    var inp = document.getElementById('bot-input');
+    var body = document.getElementById('bot-messages');
+    if (!inp || !body) return;
+    var q = inp.value.trim();
+    if (!q) return;
+    body.innerHTML += '<div class="bot-msg user">' + q.replace(/[<>&]/g, '') + '</div>';
+    inp.value = '';
+    var ql = q.toLowerCase();
+    var key = 'pro_vs_lite';
+    if (/vlc|potplayer|kmplayer|player|плеєр|плеер/i.test(ql)) key = 'other_players';
+    else if (/tv|hdmi|wi-fi|wifi|телевізор|тв|кабел/i.test(ql)) key = 'tv_hdmi';
+    else if (/del|reinstall|win|key|hwid|видал|перевстанов|ключ|віднов|планшет|tablet/i.test(ql)) key = 'restore_files';
+    else if (/apollo|аполло|озвуч|голос|voice/i.test(ql)) key = 'apollo_eta';
+    await window.askBot(key);
+};
 
-      renderEggContent(currentEggTier);
+window.copyMail = function() {
+    var email = (window.TALOS_CONFIG && window.TALOS_CONFIG.supportEmail) || 'talosvision.labs@gmail.com';
+    navigator.clipboard.writeText(email);
+    var t = document.getElementById('toast');
+    if (t) {
+        t.textContent = '✔ Скопійовано: ' + email;
+        t.style.display = 'block';
+        setTimeout(function() { t.style.display = 'none'; }, 3000);
+    }
+};
 
+window.openFastEmailModal = function() {
+    window.openModal('email-modal');
+};
+
+window.sendToGmailWebPopup = function() {
+    var subj = encodeURIComponent((document.getElementById('em-subj').value || 'TALOS VISION').trim());
+    var body = encodeURIComponent((document.getElementById('em-body').value || '').trim());
+    var url = 'https://mail.google.com/mail/?view=cm&fs=1&to=talosvision.labs@gmail.com&su=' + subj + '&body=' + body;
+    window.open(url, 'GmailCompose', 'width=680,height=620,Left=200,Top=100');
+};
+
+// 6. Великодні яйця (Медалі Бронза / Срібло / Золото) та EULA:
+var _cGold = 0, _cBronze = 0, _cSilver = 0;
+
+function recordMedalUnlock(medalType) {
+    try {
+        var mList = JSON.parse(localStorage.getItem('talos_my_medals') || '[]');
+        if (mList.indexOf(medalType) === -1) {
+            mList.push(medalType);
+            localStorage.setItem('talos_my_medals', JSON.stringify(mList));
+        }
+        fetch(getCloudUrl(), {
+            method: 'POST', mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+                type: 'MEDAL',
+                data: {
+                    ip: sessionStorage.getItem('talos_client_ip') || 'Anon',
+                    loc: sessionStorage.getItem('talos_client_loc') || 'Unknown',
+                    medals: mList,
+                    lastTime: new Date().toLocaleString('uk-UA'),
+                    lastUpdateMs: Date.now()
+                }
+            })
+        });
+    } catch (e) {}
+}
+
+window.triggerBronzeEgg = function() {
+    _cBronze++;
+    if (_cBronze >= 5) {
+        _cBronze = 0;
+        recordMedalUnlock('🥉 Бронза');
+        window.openModal('bronze-modal');
+    }
+};
+
+window.triggerSilverEgg = function() {
+    _cSilver++;
+    if (_cSilver >= 5) {
+        _cSilver = 0;
+        recordMedalUnlock('🥈 Срібло');
+        window.openModal('silver-modal');
+    }
+};
+
+window.triggerGoldEgg = function() {
+    _cGold++;
+    if (_cGold >= 5) {
+        _cGold = 0;
+        recordMedalUnlock('🥇 Золото');
+        window.openModal('egg-modal');
+    }
+};
+
+window.openTalosWebEula = function() {
+    var ex = document.getElementById('talos-eula-modal');
+    if (ex) ex.remove();
+    var hdr = window.tSlot('eula_hdr', currentLang) || '📜 EULA';
+    var bdy = window.tSlot('eula_body', currentLang) || '';
+    var m = document.createElement('div');
+    m.id = 'talos-eula-modal';
+    m.style.cssText = 'position:fixed;inset:0;background:rgba(5,6,12,0.88);backdrop-filter:blur(8px);z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px;';
+    m.innerHTML = '<div style="max-width:740px;width:100%;background:#111320;border:1px solid rgba(0,210,255,0.4);border-radius:16px;padding:24px;color:#f2f5ff;box-shadow:0 20px 60px rgba(0,0,0,0.85);">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><h3 style="color:#00f59b;margin:0;font-size:1.15rem;">' + hdr + '</h3>' +
+        '<button onclick="document.getElementById(\'talos-eula-modal\').remove()" style="background:none;border:none;color:#949cbb;font-size:1.5rem;cursor:pointer;">&times;</button></div>' +
+        '<pre style="white-space:pre-wrap;font-family:inherit;font-size:0.86rem;line-height:1.55;color:#cbd5e1;max-height:62vh;overflow-y:auto;background:#090a10;padding:16px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);">' + bdy + '</pre></div>';
+    document.body.appendChild(m);
+};
+
+// 7. Перемикач усіх 16 мов (миттєво за 0.001 сек із таблиці i18n_dict.js):
+window.selectLang = async function(lang, save) {
+    if (save === undefined) save = true;
+    currentLang = lang;
+    if (save) localStorage.setItem('talos_lang', lang);
+
+    var curCodeEl = document.getElementById('cur-lang-code');
+    if (curCodeEl) curCodeEl.textContent = (lang === 'uk') ? 'UA' : lang.toUpperCase();
+    var dd = document.getElementById('lang-dropdown');
+    if (dd) dd.classList.remove('open');
+
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        var val = window.tSlot(key, lang);
+        if (val) el.innerHTML = val;
+        else if (UK_ORIG[key]) el.innerHTML = UK_ORIG[key];
+    });
+
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n-placeholder');
+        var val = window.tSlot(key, lang);
+        if (val) el.placeholder = val;
+        else if (UK_PLACEHOLDERS[key]) el.placeholder = UK_PLACEHOLDERS[key];
+    });
+
+    var subjInput = document.getElementById('em-subj');
+    if (subjInput) {
+        var sVal = window.tSlot('em_subj_val', lang);
+        if (sVal) subjInput.value = sVal;
     }
 
-  };
+    ['bronze', 'silver'].forEach(function(tier) {
+        ['hdr', 'title', 'text', 'rank'].forEach(function(part) {
+            var el = document.getElementById('egg-' + tier + '-' + part);
+            var val = window.tSlot('egg_' + tier + '_' + part, lang);
+            if (el && val) el.innerHTML = val;
+        });
+    });
 
+    window.setHz(currentHz);
+    window.renderSteamCarousel();
+    await window.renderReviewsList();
+};
 
+// 8. Секретний Радар Адміністратора (комбінація 'zevs' або 'пуми' + PIN):
+var _secretBuf = '';
+var _PIN_DIGEST = 1510443;
+function _hHash(s) {
+    var h = 5381;
+    for (var i = 0; i < s.length; i++) h = ((h << 5) + h) + s.charCodeAt(i);
+    return h & 0x7fffffff;
+}
 
-  function injectNoticeAndFooterBtn() {
+document.addEventListener('keydown', function(e) {
+    var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+    if (tag === 'input' || tag === 'textarea') return;
+    _secretBuf = (_secretBuf + (e.key || '').toLowerCase()).slice(-8);
+    if (_secretBuf.endsWith('zevs') || _secretBuf.endsWith('пуми')) {
+        _secretBuf = '';
+        if (sessionStorage.getItem('talos_diag_auth') === '1') {
+            window.showUnlockedRadarWindow();
+        } else {
+            document.getElementById('admin-pin-input').value = '';
+            document.getElementById('pin-err-msg').textContent = '';
+            window.openModal('pin-modal');
+            setTimeout(function() { document.getElementById('admin-pin-input').focus(); }, 100);
+        }
+    }
+});
 
-    var pricingSec = document.getElementById('pricing');
+window.verifyCustomPinModal = async function() {
+    var entered = (document.getElementById('admin-pin-input').value || '').trim();
+    if (_hHash(entered) === _PIN_DIGEST) {
+        sessionStorage.setItem('talos_diag_auth', '1');
+        try {
+            if (window.crypto && window.crypto.subtle) {
+                var buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode('TALOS_SALT_v10_' + entered));
+                var srvKey = Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+                sessionStorage.setItem('talos_srv_sha256', srvKey);
+            }
+        } catch (e) {}
+        window.closeModal('pin-modal');
+        window.renderReviewsList();
+        window.showUnlockedRadarWindow();
+    } else {
+        document.getElementById('pin-err-msg').textContent = '❌ Невірний код авторизації!';
+    }
+};
 
-    if (pricingSec && !document.getElementById('talosOnlineNoticeBadge')) {
+window.showUnlockedRadarWindow = async function() {
+    window.openModal('diag-modal');
+    var srvKey = sessionStorage.getItem('talos_srv_sha256') || '';
+    var tbody = document.getElementById('diag-log-tbody');
+    var mTbody = document.getElementById('medal-log-tbody');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--accent);">⏳ Синхронізація з хмарним сервером TALOS SHIELD...</td></tr>';
 
-      var badge = document.createElement('div');
+    try {
+        var res = await fetch(getCloudUrl() + '?auth=' + encodeURIComponent(srvKey));
+        var data = await res.json();
+        if (data && data.access === 'granted') {
+            var visits = data.visits || [];
+            var medals = data.medals || [];
+            document.getElementById('st-total').textContent = visits.length;
+            if (tbody) {
+                tbody.innerHTML = visits.length ? visits.map(function(v) {
+                    return '<tr><td style="padding:6px;">' + (v.time || '') + '</td><td>' + (v.ip || '') + '</td><td>' + (v.loc || '') + '</td><td>' + (v.gpu || '') + '</td><td>' + (v.res || '') + '</td></tr>';
+                }).join('') : '<tr><td colspan="5" style="text-align:center;">Записів поки немає</td></tr>';
+            }
+            if (mTbody) {
+                mTbody.innerHTML = medals.length ? medals.map(function(m, idx) {
+                    return '<tr><td style="padding:6px;">#' + (idx + 1) + '</td><td>' + (m.lastTime || '') + '</td><td>' + (m.ip || '') + '</td><td>' + (m.loc || '') + '</td><td>' + (m.medals || []).join(', ') + '</td></tr>';
+                }).join('') : '<tr><td colspan="5" style="text-align:center;">Медалей поки немає</td></tr>';
+            }
+        }
+    } catch (e) {}
+};
 
-      badge.id = 'talosOnlineNoticeBadge';
+// 9. Ініціалізація при завантаженні сторінки:
+window.addEventListener('DOMContentLoaded', async function() {
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        UK_ORIG[el.getAttribute('data-i18n')] = el.innerHTML;
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+        UK_PLACEHOLDERS[el.getAttribute('data-i18n-placeholder')] = el.placeholder;
+    });
 
-      badge.className = 'talos-online-badge';
-
-      var h2 = pricingSec.querySelector('h2, .section-title, p');
-
-      if (h2 && h2.parentNode) {
-
-        var wrap = document.createElement('div');
-
-        wrap.style.textAlign = 'center';
-
-        wrap.style.marginBottom = '18px';
-
-        wrap.appendChild(badge);
-
-        h2.parentNode.insertBefore(wrap, h2.nextSibling);
-
-      }
-
+    var langBtn = document.getElementById('lang-btn');
+    var langDd = document.getElementById('lang-dropdown');
+    if (langBtn && langDd) {
+        langBtn.addEventListener('click', function(ev) {
+            ev.stopPropagation();
+            langDd.classList.toggle('open');
+        });
+        document.addEventListener('click', function() { langDd.classList.remove('open'); });
     }
 
-    var footer = document.querySelector('footer');
-
-    if (footer && !document.getElementById('talosFooterEulaBtn')) {
-
-      var btn = document.createElement('button');
-
-      btn.id = 'talosFooterEulaBtn';
-
-      btn.className = 'talos-eula-btn';
-
-      btn.onclick = window.openTalosWebEula;
-
-      var targetContainer = footer.querySelector('p, div') || footer;
-
-      targetContainer.appendChild(btn);
-
-    }
-
-    updateExtraStaticElements();
-
-  }
-
-
-
-  if (document.readyState === 'loading') {
-
-    document.addEventListener('DOMContentLoaded', injectNoticeAndFooterBtn);
-
-  } else {
-
-    injectNoticeAndFooterBtn();
-
-  }
-
-})();
-
+    var savedLang = localStorage.getItem('talos_lang') || 'uk';
+    await window.selectLang(savedLang, false);
+});
 </script>
-
-<!-- END TALOS v6.7 PATCH -->
-
-
-
+<!-- === END_MAIN_SCRIPT === -->
 </body>
-
 </html>
-
