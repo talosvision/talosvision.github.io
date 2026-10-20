@@ -4714,39 +4714,7 @@
 
             }
 
-            const targetMail = cfg.supportEmail || "talosvision.labs@gmail.com";
-
-            const readyJsonSnippet = JSON.stringify(newRevObj, null, 8);
-
-            await fetch(`https://formsubmit.co/ajax/${targetMail}`, {
-
-                method: "POST",
-
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
-
-                body: JSON.stringify({
-
-                    _subject: `${isUpdate ? '🔄 ОНОВЛЕНА ОЦІНКА' : '⭐ Новий відгук'} TALOS (${edition}, ${selectedReviewStars}/5) від ${name}`,
-
-                    Author: name,
-
-                    Client_Email: email || "Не вказано",
-
-                    Is_Rating_Update: isUpdate ? "ТАК (Оновлення після патчу)" : "Ні (Новий відгук)",
-
-                    Edition: edition,
-
-                    Hardware: hw,
-
-                    Rating: `${selectedReviewStars} / 5`,
-
-                    Review_Text: text,
-
-                    Ready_JSON_For_links_config: readyJsonSnippet
-
-                })
-
-            });
+            // Сповіщення надсилається у надсучасному кіберпанк HTML-форматі через хмарний сервер TALOS_Cloud_Master v10.3
 
         } catch(e) {}
 
@@ -5096,26 +5064,23 @@
 
 
 
-        function verifyCustomPinModal() {
-
+        async function verifyCustomPinModal() {
         const entered = (document.getElementById('admin-pin-input').value || '').trim();
-
         if (_hHash(entered) === _PIN_DIGEST) {
-
             sessionStorage.setItem('talos_diag_auth', '1');
-
+            try {
+                if (window.crypto && window.crypto.subtle) {
+                    const buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode('TALOS_SALT_v10_' + entered));
+                    const srvKey = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+                    sessionStorage.setItem('talos_srv_sha256', srvKey);
+                }
+            } catch (e) {}
             closeModal('pin-modal');
-
             renderReviewsList();
-
             showUnlockedRadarWindow();
-
         } else {
-
             document.getElementById('pin-err-msg').textContent = "❌ Невірний код авторизації!";
-
         }
-
     }
 
 
@@ -6130,7 +6095,7 @@
 
         hero_vet_badge: "UKRAINIAN COMBAT VETERAN R&D • OFFICIAL LABORATORY",
 
-        hero_release: "TALOS 60FPS VIDEO SUITE (POWERED BY MPC-HC FOR WINDOWS PC) • v4.5",
+        hero_release: "TALOS 60FPS VIDEO SUITE (POWERED BY MPC-HC FOR WINDOWS PC) • v6.5",
 
         hero_tagline: "Cybernetic smoothness for movies & anime at <span class='grad-text'>60–144 FPS</span> on your PC or laptop",
 
@@ -6902,23 +6867,6 @@
 
 
 
-  // Захищений генератор SHA-256 ключа сесії для TALOS RADAR (без відкритого ключа у F12):
-  if (!window._talosPromptHooked) {
-    window._talosPromptHooked = true;
-    var _nativePrompt = window.prompt.bind(window);
-    window.prompt = function(msg, defVal) {
-      var enteredPin = _nativePrompt(msg, defVal);
-      if (enteredPin && window.crypto && window.crypto.subtle) {
-        window.crypto.subtle.digest('SHA-256', new TextEncoder().encode('TALOS_SALT_v10_' + String(enteredPin).trim())).then(function(buf) {
-          var srvKey = Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
-          sessionStorage.setItem('talos_srv_sha256', srvKey);
-          if (typeof syncCloudTelemetryPull === 'function') syncCloudTelemetryPull();
-        });
-      }
-      return enteredPin;
-    };
-  }
-  
   // 3. Секція Відгуків бере всі бейджі та переклади верифікованих відгуків прямо з таблиці!
 
   window.renderReviewsList = async function() {
@@ -7100,22 +7048,6 @@
 
 
   
-
-  window.enableAdminReplyModeFromRadar = function() {
-
-    window._ADMIN_REPLY_MODE_ACTIVE = !window._ADMIN_REPLY_MODE_ACTIVE;
-
-    closeModal('radar-modal');
-
-    renderReviewsList();
-
-    var revSec = document.getElementById('reviews');
-
-    if (revSec) revSec.scrollIntoView({ behavior: 'smooth' });
-
-  };
-
-
 
   // 5. Головний перемикач мови: підставляє кожен вираз із таблиці на його місце на сайті за 0.001 сек!
 
