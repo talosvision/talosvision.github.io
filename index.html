@@ -3694,12 +3694,12 @@
 <!-- === START_MAIN_SCRIPT === -->
 <script>
 // ============================================================================
-// 🚀 TALOS VISION v10.7 — ЄДИНИЙ ЧИСТИЙ ДВИГУН САЙТУ (16 МОВ, БЕЗ LOCALSTORAGE ДЛЯ ВІДГУКІВ)
-// 1. Повністю прибрано збереження коментарів у localStorage (відображаються тільки з reviews_db.js).
-// 2. Усі функції та ID на 100% синхронізовані з версткою index.html та links_config.js.
+// 🚀 TALOS VISION v10.11 — ЄДИНИЙ МОНОЛІТНИЙ ДВИГУН САЙТУ (БЕЗ REGEX-ПАТЧІВ)
+// 1. 16 мов (i18n_dict.js), 0% localStorage для відгуків.
+// 2. Плейлисти YouTube, мобільне Бургер-меню, zevs / яумі + прямий пароль 1313.
+// 3. 16-мовний WebGL-сканер заліза + детектор смартфонів + розумний ШІ-бот.
 // ============================================================================
 
-// Примусове очищення всіх старих локальних кешів коментарів у браузері (Тест 2, Тест 3, Тест 5 зникають назавжди!):
 ['talos_user_reviews_v1', 'talos_rev_cache_v82', 'talos_rev_cache_v106', 'talos_reviews_local', 'talos_gtx_i18n_v4'].forEach(function(k) {
     try { localStorage.removeItem(k); } catch (e) {}
 });
@@ -3713,6 +3713,7 @@ let _activeReplyIdx = -1;
 let _currentRadarFilter = 'all';
 let _cachedCloudVisits = [];
 let _cachedCloudMedals = [];
+let _lastScanData = null;
 
 const UK_ORIG = {};
 const UK_PLACEHOLDERS = {};
@@ -3726,7 +3727,7 @@ window.tSlot = function(slotKey, lang) {
     }
     var byL = window.TALOS_BY_LANG;
     if (byL && byL[lg] && byL[lg][slotKey]) return byL[lg][slotKey];
-    if (byL && byL['uk'] && byL['uk'][slotKey]) return byL['uk'][slotKey];
+    if (byL && byL['uk'] && byL['uk'][slotKey]) return byL[lg][slotKey];
     return '';
 };
 
@@ -3744,16 +3745,41 @@ function decodeHtmlEntities(str) {
         .replace(/&amp;/g, '&');
 }
 
-// 1. КНОПКА ТА МЕНЮ ВИБОРУ 16 МОВ:
+// 1. БУРГЕР-МЕНЮ ТА ВИБІР 16 МОВ:
+window.toggleMobileNav = function(ev) {
+    if (ev) ev.stopPropagation();
+    var drawer = document.getElementById('mobile-nav-drawer');
+    var btn = document.getElementById('burger-toggle-btn');
+    var langMenu = document.getElementById('lang-menu');
+    if (langMenu) langMenu.classList.remove('show');
+    if (drawer) drawer.classList.toggle('mobile-open');
+    if (btn) btn.classList.toggle('open');
+};
+
+window.closeMobileNav = function() {
+    var drawer = document.getElementById('mobile-nav-drawer');
+    var btn = document.getElementById('burger-toggle-btn');
+    if (drawer) drawer.classList.remove('mobile-open');
+    if (btn) btn.classList.remove('open');
+};
+
 window.toggleLangMenu = function(ev) {
     if (ev) ev.stopPropagation();
+    window.closeMobileNav();
     var menu = document.getElementById('lang-menu');
     if (menu) menu.classList.toggle('show');
 };
 
-document.addEventListener('click', function() {
+document.addEventListener('click', function(ev) {
     var menu = document.getElementById('lang-menu');
     if (menu) menu.classList.remove('show');
+    var drawer = document.getElementById('mobile-nav-drawer');
+    var btn = document.getElementById('burger-toggle-btn');
+    if (drawer && drawer.classList.contains('mobile-open')) {
+        if (!drawer.contains(ev.target) && (!btn || !btn.contains(ev.target))) {
+            window.closeMobileNav();
+        }
+    }
 });
 
 window.selectLang = async function(lang, labelCode, save) {
@@ -3800,6 +3826,7 @@ window.selectLang = async function(lang, labelCode, save) {
 
     window.setHz(currentHz);
     window.renderSteamShowcase();
+    renderHardwareScanResultBox();
     await window.renderReviewsList();
 };
 
@@ -3935,7 +3962,7 @@ window.renderSteamShowcase = function() {
     }
 };
 
-// 4. АВТОДІАГНОСТИКА ПК ПРЯМО В БРАУЗЕРІ (16 МОВ + ДЕТЕКТОР СМАРТФОНІВ ADRENO/MALI/APPLE):
+// 4. АВТОДІАГНОСТИКА ПК ПРЯМО В БРАУЗЕРІ (16 МОВ + ДЕТЕКТОР СМАРТФОНІВ):
 var SCANNER_I18N_16 = {
     uk: { wait: "⏳ Сканування відеокарти (WebGL), потоків процесора та герцовки матриці...", gpu: "🎮 Відеокарта (GPU):", cpu: "🧠 Потоки процесора (CPU Threads):", disp: "🖥️ Фізична матриця та частота:", rec: "🏆 Рекомендована версія:", mob: "📱 <b>Увага (Мобільний пристрій):</b> Ви запустили тест зі смартфона/планшета ({gpu}). Комплекс <b>TALOS 60FPS</b> створено для комп’ютерів і ноутбуків з <b>Windows 10/11</b> — відкрийте цей тест на своєму ПК!" },
     en: { wait: "⏳ Scanning GPU (WebGL), CPU Threads & Display Refresh Rate...", gpu: "🎮 Graphics Card (GPU):", cpu: "🧠 CPU Threads:", disp: "🖥️ Native Display & Refresh Rate:", rec: "🏆 Recommended Edition:", mob: "📱 <b>Mobile Device Detected ({gpu}):</b> <b>TALOS 60FPS</b> is designed for <b>Windows 10/11 PCs and laptops</b>. Please run this online test on your computer!" },
@@ -3954,8 +3981,6 @@ var SCANNER_I18N_16 = {
     tr: { wait: "⏳ Ekran kartı (WebGL), CPU iş parçacıkları ve yenileme hızı taranıyor...", gpu: "🎮 Ekran Kartı (GPU):", cpu: "🧠 İşlemci İş Parçacığı (CPU):", disp: "🖥️ Fiziksel Çözünürlük ve Hız:", rec: "🏆 Önerilen Sürüm:", mob: "📱 <b>Mobil Cihaz Algılandı ({gpu}):</b> <b>TALOS 60FPS</b>, <b>Windows 10/11 bilgisayarlar ve dizüstü bilgisayarlar</b> içindir. Lütfen testi bilgisayarınızda çalıştırın!" },
     ko: { wait: "⏳ 그래픽 카드(WebGL), CPU 스레드 및 모니터 주사율 스캔 중...", gpu: "🎮 그래픽 카드 (GPU):", cpu: "🧠 프로세서 스레드 (CPU):", disp: "🖥️ 물리적 해상도 및 주사율:", rec: "🏆 권장 에디션:", mob: "📱 <b>모바일 기기 감지됨 ({gpu}):</b> <b>TALOS 60FPS</b>는 <b>Windows 10/11 PC 및 노트북</b> 전용입니다. PC 브라우저에서 테스트를 실행해 주세요!" }
 };
-
-var _lastScanData = null;
 
 function renderHardwareScanResultBox() {
     var box = document.getElementById('web-scan-result');
@@ -4026,7 +4051,7 @@ window.runInstantBrowserHardwareScan = async function() {
     renderHardwareScanResultBox();
 };
 
-// 5. ВІДГУКИ КОРИСТУВАЧІВ (0% LOCALSTORAGE — ЧИТАЄТЬСЯ ВИКЛЮЧНО З БАЗИ reviews_db.js!):
+// 5. ВІДГУКИ КОРИСТУВАЧІВ (0% LOCALSTORAGE — ЧИТАЄТЬСЯ ВИКЛЮЧНО З БАЗИ reviews_db.js):
 var PENDING_I18N_NOTICE = {
     en: "⏳ Preparing 2-pass neural AI translation into English (~15–30 sec). Please refresh the page shortly!",
     de: "⏳ 2-stufige neuronale KI-Übersetzung ins Deutsche wird vorbereitet (~15–30 Sek.). Bitte Seite in Kürze aktualisieren!",
@@ -4043,6 +4068,83 @@ var PENDING_I18N_NOTICE = {
     sv: "⏳ Förbereder 2-stegs neural AI-översättning till svenska (~15–30 sek). Uppdatera sidan om en liten stund!",
     tr: "⏳ Türkçe diline 2 aşamalı nöral yapay zeka çevirisi hazırlanıyor (~15–30 sn). Lütfen birazdan sayfayı yenileyin!",
     ko: "⏳ 2단계 신경망 AI 한국어 번역을 준비 중입니다(약 15~30초 소요). 잠시 후 페이지를 새로고침해 주세요!"
+};
+
+var REV_MSG_EMPTY_16 = {
+    uk: "⚠️ Будь ласка, заповніть ваше ім'я, залізо та текст відгуку!",
+    en: "⚠️ Please fill in your name, hardware, and review text!",
+    de: "⚠️ Bitte füllen Sie Ihren Namen, Ihre Hardware und den Bewertungstext aus!",
+    fr: "⚠️ Veuillez remplir votre nom, votre matériel et le texte de l'avis !",
+    pl: "⚠️ Proszę wypełnić imię, sprzęt oraz treść opinii!",
+    es: "⚠️ ¡Por favor, rellena tu nombre, hardware y el texto de la reseña!",
+    it: "⚠️ Compila il tuo nome, l'hardware e il testo della recensione!",
+    bg: "⚠️ Моля, попълнете вашето име, хардуер и текста на отзива!",
+    ja: "⚠️ お名前、お使いのハードウェア、およびレビュー本文をすべて入力してください！",
+    cs: "⚠️ Vyplňte prosím své jméno, hardware a text recenze!",
+    ro: "⚠️ Vă rugăm să completați numele, hardware-ul și textul recenziei!",
+    nl: "⚠️ Vul alstublieft uw naam, hardware en beoordelingstekst in!",
+    pt: "⚠️ Por favor, preencha o seu nome, hardware e o texto da avaliação!",
+    sv: "⚠️ Vänligen fyll i ditt namn, din hårdvara och recensionstexten!",
+    tr: "⚠️ Lütfen adınızı, donanımınızı ve değerlendirme metninizi doldurun!",
+    ko: "⚠️ 성함, 하드웨어 사양 및 후기 내용을 모두 입력해 주세요!"
+};
+
+var REV_MSG_OK_16 = {
+    uk: "✅ Надіслано в хмарний центр TALOS! Лист відправлено, а відгук і його 16 перекладів з’являться на сайті після синхронізації GitHub (~30 сек).",
+    en: "✅ Sent to TALOS Cloud! Your review and its 16 AI translations will appear after GitHub sync (~30 sec).",
+    de: "✅ An TALOS Cloud gesendet! Ihre Bewertung erscheint nach der GitHub-Synchronisierung (~30 Sek.) in 16 Sprachen.",
+    fr: "✅ Envoyé au cloud TALOS ! Votre avis et ses 16 traductions IA apparaîtront après synchronisation GitHub (~30 sec).",
+    pl: "✅ Wysłano do chmury TALOS! Twoja opinia i jej 16 tłumaczeń AI pojawi się po synchronizacji GitHub (~30 sek.).",
+    es: "✅ ¡Enviado a TALOS Cloud! Tu reseña y sus 16 traducciones IA aparecerán tras la sincronización (~30 seg).",
+    it: "✅ Inviato a TALOS Cloud! La tua recensione e le 16 traduzioni IA appariranno dopo la sincronizzazione (~30 sec).",
+    bg: "✅ Изпратено до облака TALOS! Вашият отзив и 16-те превода ще се появят след синхронизацията (~30 сек).",
+    ja: "✅ TALOSクラウドへ送信されました！GitHub同期後（約30秒）に16言語すべてのAI翻訳とともに掲載されます。",
+    cs: "✅ Odesláno do cloudu TALOS! Vaše recenze se zobrazí v 16 jazycích po synchronizaci GitHubu (~30 sek.).",
+    ro: "✅ Trimis în cloud-ul TALOS! Recenzia dvs. în 16 limbi va apărea după sincronizarea GitHub (~30 sec).",
+    nl: "✅ Verzonden naar TALOS Cloud! Je recensie verschijnt na GitHub-synchronisatie (~30 sec) in 16 talen.",
+    pt: "✅ Enviado para a nuvem TALOS! A sua avaliação aparecerá em 16 idiomas após a sincronização (~30 seg).",
+    sv: "✅ Skickat till TALOS Cloud! Din recension visas på 16 språk efter GitHub-synkronisering (~30 sek).",
+    tr: "✅ TALOS Bulut'a gönderildi! Değerlendirmeniz (~30 sn) içinde 16 dilde sitede yayınlanacaktır.",
+    ko: "✅ TALOS 클라우드로 전송되었습니다! 약 30초 후 GitHub 동기화가 완료되면 16개 국어 AI 번역과 함께 게시됩니다."
+};
+
+var EMAIL_ORDER_SUBJ_16 = {
+    pro: {
+        uk: "TALOS 60FPS PRO — Замовлення ліцензії ($20 / 830 ₴)",
+        en: "TALOS 60FPS PRO — License Order ($20 USD)",
+        de: "TALOS 60FPS PRO — Lizenzbestellung ($20 USD)",
+        fr: "TALOS 60FPS PRO — Commande de licence (20 $ USD)",
+        pl: "TALOS 60FPS PRO — Zamówienie licencji ($20 USD)",
+        es: "TALOS 60FPS PRO — Pedido de licencia ($20 USD)",
+        it: "TALOS 60FPS PRO — Ordine licenza ($20 USD)",
+        bg: "TALOS 60FPS PRO — Поръчка на лиценз ($20 USD)",
+        ja: "TALOS 60FPS PRO — ライセンスのご注文 ($20 USD)",
+        cs: "TALOS 60FPS PRO — Objednávka licence ($20 USD)",
+        ro: "TALOS 60FPS PRO — Comandă licență ($20 USD)",
+        nl: "TALOS 60FPS PRO — Licentiebestelling ($20 USD)",
+        pt: "TALOS 60FPS PRO — Encomenda de licença ($20 USD)",
+        sv: "TALOS 60FPS PRO — Licensbeställning ($20 USD)",
+        tr: "TALOS 60FPS PRO — Lisans Siparişi ($20 USD)",
+        ko: "TALOS 60FPS PRO — 라이선스 주문 ($20 USD)"
+    },
+    lite: {
+        uk: "TALOS 60FPS LITE — Замовлення ліцензії ($10 / 415 ₴)",
+        en: "TALOS 60FPS LITE — License Order ($10 USD)",
+        de: "TALOS 60FPS LITE — Lizenzbestellung ($10 USD)",
+        fr: "TALOS 60FPS LITE — Commande de licence (10 $ USD)",
+        pl: "TALOS 60FPS LITE — Zamówienie licencji ($10 USD)",
+        es: "TALOS 60FPS LITE — Pedido de licencia ($10 USD)",
+        it: "TALOS 60FPS LITE — Ordine licenza ($10 USD)",
+        bg: "TALOS 60FPS LITE — Поръчка на лиценз ($10 USD)",
+        ja: "TALOS 60FPS LITE — ライセンスのご注文 ($10 USD)",
+        cs: "TALOS 60FPS LITE — Objednávka licence ($10 USD)",
+        ro: "TALOS 60FPS LITE — Comandă licență ($10 USD)",
+        nl: "TALOS 60FPS LITE — Licentiebestelling ($10 USD)",
+        pt: "TALOS 60FPS LITE — Encomenda de licença ($10 USD)",
+        sv: "TALOS 60FPS LITE — Licensbeställning ($10 USD)",
+        tr: "TALOS 60FPS LITE — Lisans Siparişi ($10 USD)",
+        ko: "TALOS 60FPS LITE — 라이선스 주문 ($10 USD)"
+    }
 };
 
 function transliterateUaAuthor(str) {
@@ -4139,83 +4241,6 @@ window.renderReviewsList = async function() {
         );
     }
     container.innerHTML = htmlCards.join('');
-};
-
-var REV_MSG_EMPTY_16 = {
-    uk: "⚠️ Будь ласка, заповніть ваше ім'я, залізо та текст відгуку!",
-    en: "⚠️ Please fill in your name, hardware, and review text!",
-    de: "⚠️ Bitte füllen Sie Ihren Namen, Ihre Hardware und den Bewertungstext aus!",
-    fr: "⚠️ Veuillez remplir votre nom, votre matériel et le texte de l'avis !",
-    pl: "⚠️ Proszę wypełnić imię, sprzęt oraz treść opinii!",
-    es: "⚠️ ¡Por favor, rellena tu nombre, hardware y el texto de la reseña!",
-    it: "⚠️ Compila il tuo nome, l'hardware e il testo della recensione!",
-    bg: "⚠️ Моля, попълнете вашето име, хардуер и текста на отзива!",
-    ja: "⚠️ お名前、お使いのハードウェア、およびレビュー本文をすべて入力してください！",
-    cs: "⚠️ Vyplňte prosím své jméno, hardware a text recenze!",
-    ro: "⚠️ Vă rugăm să completați numele, hardware-ul și textul recenziei!",
-    nl: "⚠️ Vul alstublieft uw naam, hardware en beoordelingstekst in!",
-    pt: "⚠️ Por favor, preencha o seu nome, hardware e o texto da avaliação!",
-    sv: "⚠️ Vänligen fyll i ditt namn, din hårdvara och recensionstexten!",
-    tr: "⚠️ Lütfen adınızı, donanımınızı ve değerlendirme metninizi doldurun!",
-    ko: "⚠️ 성함, 하드웨어 사양 및 후기 내용을 모두 입력해 주세요!"
-};
-
-var REV_MSG_OK_16 = {
-    uk: "✅ Надіслано в хмарний центр TALOS! Лист відправлено, а відгук і його 16 перекладів з’являться на сайті після синхронізації GitHub (~30 сек).",
-    en: "✅ Sent to TALOS Cloud! Your review and its 16 AI translations will appear after GitHub sync (~30 sec).",
-    de: "✅ An TALOS Cloud gesendet! Ihre Bewertung erscheint nach der GitHub-Synchronisierung (~30 Sek.) in 16 Sprachen.",
-    fr: "✅ Envoyé au cloud TALOS ! Votre avis et ses 16 traductions IA apparaîtront après synchronisation GitHub (~30 sec).",
-    pl: "✅ Wysłano do chmury TALOS! Twoja opinia i jej 16 tłumaczeń AI pojawi się po synchronizacji GitHub (~30 sek.).",
-    es: "✅ ¡Enviado a TALOS Cloud! Tu reseña y sus 16 traducciones IA aparecerán tras la sincronización (~30 seg).",
-    it: "✅ Inviato a TALOS Cloud! La tua recensione e le 16 traduzioni IA appariranno dopo la sincronizzazione (~30 sec).",
-    bg: "✅ Изпратено до облака TALOS! Вашият отзив и 16-те превода ще се появят след синхронизацията (~30 сек).",
-    ja: "✅ TALOSクラウドへ送信されました！GitHub同期後（約30秒）に16言語すべてのAI翻訳とともに掲載されます。",
-    cs: "✅ Odesláno do cloudu TALOS! Vaše recenze se zobrazí v 16 jazycích po synchronizaci GitHubu (~30 sek.).",
-    ro: "✅ Trimis în cloud-ul TALOS! Recenzia dvs. în 16 limbi va apărea după sincronizarea GitHub (~30 sec).",
-    nl: "✅ Verzonden naar TALOS Cloud! Je recensie verschijnt na GitHub-synchronisatie (~30 sec) in 16 talen.",
-    pt: "✅ Enviado para a nuvem TALOS! A sua avaliação aparecerá em 16 idiomas após a sincronização (~30 seg).",
-    sv: "✅ Skickat till TALOS Cloud! Din recension visas på 16 språk efter GitHub-synkronisering (~30 sek).",
-    tr: "✅ TALOS Bulut'a gönderildi! Değerlendirmeniz (~30 sn) içinde 16 dilde sitede yayınlanacaktır.",
-    ko: "✅ TALOS 클라우드로 전송되었습니다! 약 30초 후 GitHub 동기화가 완료되면 16개 국어 AI 번역과 함께 게시됩니다."
-};
-
-var EMAIL_ORDER_SUBJ_16 = {
-    pro: {
-        uk: "TALOS 60FPS PRO — Замовлення ліцензії ($20 / 830 ₴)",
-        en: "TALOS 60FPS PRO — License Order ($20 USD)",
-        de: "TALOS 60FPS PRO — Lizenzbestellung ($20 USD)",
-        fr: "TALOS 60FPS PRO — Commande de licence (20 $ USD)",
-        pl: "TALOS 60FPS PRO — Zamówienie licencji ($20 USD)",
-        es: "TALOS 60FPS PRO — Pedido de licencia ($20 USD)",
-        it: "TALOS 60FPS PRO — Ordine licenza ($20 USD)",
-        bg: "TALOS 60FPS PRO — Поръчка на лиценз ($20 USD)",
-        ja: "TALOS 60FPS PRO — ライセンスのご注文 ($20 USD)",
-        cs: "TALOS 60FPS PRO — Objednávka licence ($20 USD)",
-        ro: "TALOS 60FPS PRO — Comandă licență ($20 USD)",
-        nl: "TALOS 60FPS PRO — Licentiebestelling ($20 USD)",
-        pt: "TALOS 60FPS PRO — Encomenda de licença ($20 USD)",
-        sv: "TALOS 60FPS PRO — Licensbeställning ($20 USD)",
-        tr: "TALOS 60FPS PRO — Lisans Siparişi ($20 USD)",
-        ko: "TALOS 60FPS PRO — 라이선스 주문 ($20 USD)"
-    },
-    lite: {
-        uk: "TALOS 60FPS LITE — Замовлення ліцензії ($10 / 415 ₴)",
-        en: "TALOS 60FPS LITE — License Order ($10 USD)",
-        de: "TALOS 60FPS LITE — Lizenzbestellung ($10 USD)",
-        fr: "TALOS 60FPS LITE — Commande de licence (10 $ USD)",
-        pl: "TALOS 60FPS LITE — Zamówienie licencji ($10 USD)",
-        es: "TALOS 60FPS LITE — Pedido de licencia ($10 USD)",
-        it: "TALOS 60FPS LITE — Ordine licenza ($10 USD)",
-        bg: "TALOS 60FPS LITE — Поръчка на лиценз ($10 USD)",
-        ja: "TALOS 60FPS LITE — ライセンスのご注文 ($10 USD)",
-        cs: "TALOS 60FPS LITE — Objednávka licence ($10 USD)",
-        ro: "TALOS 60FPS LITE — Comandă licență ($10 USD)",
-        nl: "TALOS 60FPS LITE — Licentiebestelling ($10 USD)",
-        pt: "TALOS 60FPS LITE — Encomenda de licença ($10 USD)",
-        sv: "TALOS 60FPS LITE — Licensbeställning ($10 USD)",
-        tr: "TALOS 60FPS LITE — Lisans Siparişi ($10 USD)",
-        ko: "TALOS 60FPS LITE — 라이선스 주문 ($10 USD)"
-    }
 };
 
 window.submitUserReview = async function() {
@@ -4374,7 +4399,7 @@ window.triggerEasterEgg = function(tier, btn) {
     }
 };
 
-// 7. МОДАЛЬНІ ВІКНА, APOLLO, ПОКУПКА, ПОШТА ТА ШІ-БОТ:
+// 7. МОДАЛЬНІ ВІКНА, APOLLO, ПОКУПКА, ПОШТА ТА РОЗУМНИЙ ШІ-БОТ:
 window.openModal = function(id) {
     var m = document.getElementById(id);
     if (m) m.classList.add('open');
@@ -4418,10 +4443,10 @@ window.handleDonateApolloClick = function() {
 window.openEmailActionModal = function(ctx) {
     var subjEl = document.getElementById('quick-mail-subj');
     if (subjEl) {
-        if (ctx === 'pro') subjEl.value = (EMAIL_ORDER_SUBJ_16.pro[currentLang] || EMAIL_ORDER_SUBJ_16.pro['en']);
-        else if (ctx === 'lite') subjEl.value = (EMAIL_ORDER_SUBJ_16.lite[currentLang] || EMAIL_ORDER_SUBJ_16.lite['en']);
-        else if (ctx === 'apollo') subjEl.value = 'APOLLO AI — Підтримка розробки / Партнерство';
-        else subjEl.value = window.tSlot('em_subj_val', currentLang) || 'TALOS VISION — Питання до підтримки';
+        if (ctx === 'pro') subjEl.value = EMAIL_ORDER_SUBJ_16.pro[currentLang] || EMAIL_ORDER_SUBJ_16.pro['en'];
+        else if (ctx === 'lite') subjEl.value = EMAIL_ORDER_SUBJ_16.lite[currentLang] || EMAIL_ORDER_SUBJ_16.lite['en'];
+        else if (ctx === 'apollo') subjEl.value = 'APOLLO AI — Support / Partnership';
+        else subjEl.value = window.tSlot('em_subj_val', currentLang) || 'TALOS VISION — Support Inquiry';
     }
     window.openModal('email-modal');
 };
@@ -4438,7 +4463,7 @@ window.copyLabEmail = function(btn) {
     navigator.clipboard.writeText(email);
     if (btn) {
         var oldHtml = btn.innerHTML;
-        btn.innerHTML = '✔ Скопійовано: ' + email;
+        btn.innerHTML = '✔ ' + email;
         setTimeout(function() { btn.innerHTML = oldHtml; }, 2200);
     }
 };
@@ -4466,27 +4491,25 @@ window.sendCustomBotMsg = function() {
     var ql = q.toLowerCase();
     var ans = '';
 
-    if (/vlc|potplayer|kmplayer|player|плеєр|плеер|mpc|інш/i.test(ql)) {
+    if (ql.indexOf('vlc') !== -1 || ql.indexOf('potplayer') !== -1 || ql.indexOf('kmplayer') !== -1 || ql.indexOf('player') !== -1 || ql.indexOf('плеєр') !== -1 || ql.indexOf('плеер') !== -1 || ql.indexOf('mpc') !== -1) {
         ans = window.tSlot('bot_ans_other_players', currentLang);
-    } else if (/tv|hdmi|wi-fi|wifi|телевізор|тв|кабел|displayport|miracast|екран/i.test(ql)) {
+    } else if (ql.indexOf('tv') !== -1 || ql.indexOf('hdmi') !== -1 || ql.indexOf('wi-fi') !== -1 || ql.indexOf('wifi') !== -1 || ql.indexOf('телевізор') !== -1 || ql.indexOf('тв') !== -1 || ql.indexOf('кабел') !== -1) {
         ans = window.tSlot('bot_ans_tv_hdmi', currentLang);
-    } else if (/del|reinstall|win|key|hwid|видал|перевстанов|ключ|віднов|планшет|tablet|знижк|50%/i.test(ql)) {
+    } else if (ql.indexOf('del') !== -1 || ql.indexOf('reinstall') !== -1 || ql.indexOf('hwid') !== -1 || ql.indexOf('видал') !== -1 || ql.indexOf('перевстанов') !== -1 || ql.indexOf('ключ') !== -1 || ql.indexOf('віднов') !== -1 || ql.indexOf('планшет') !== -1 || ql.indexOf('tablet') !== -1 || ql.indexOf('50%') !== -1) {
         ans = window.tSlot('bot_ans_restore_files', currentLang);
-    } else if (/apollo|аполло|озвуч|голос|voice|дубляж/i.test(ql)) {
+    } else if (ql.indexOf('apollo') !== -1 || ql.indexOf('аполло') !== -1 || ql.indexOf('озвуч') !== -1 || ql.indexOf('голос') !== -1 || ql.indexOf('voice') !== -1 || ql.indexOf('дубляж') !== -1) {
         ans = window.tSlot('bot_ans_apollo_eta', currentLang);
-    } else if (/svp|російськ|кращ|better|difference/i.test(ql)) {
+    } else if (ql.indexOf('svp') !== -1 || ql.indexOf('кращ') !== -1 || ql.indexOf('better') !== -1) {
         ans = window.tSlot('a3', currentLang);
-    } else if (/навантаж|load|cpu|фонов|background|гальм/i.test(ql)) {
+    } else if (ql.indexOf('навантаж') !== -1 || ql.indexOf('фонов') !== -1 || ql.indexOf('гальм') !== -1) {
         ans = window.tSlot('a1', currentLang);
-    } else if (/налашт|вручн|setup|install|встанов/i.test(ql)) {
+    } else if (ql.indexOf('налашт') !== -1 || ql.indexOf('вручн') !== -1 || ql.indexOf('встанов') !== -1 || ql.indexOf('install') !== -1) {
         ans = window.tSlot('a2', currentLang);
-    } else if (/вимог|req|rtx|gtx|ryzen|intel|озу|ram|слабк/i.test(ql)) {
-        ans = window.tSlot('bot_ans_pro_vs_lite', currentLang) + '<br><br>💡 ' + window.tSlot('chk_desc', currentLang);
-    } else if (/цін|тариф|купит|price|buy|cost|скільки|10|20|415|830/i.test(ql)) {
+    } else if (ql.indexOf('цін') !== -1 || ql.indexOf('тариф') !== -1 || ql.indexOf('купит') !== -1 || ql.indexOf('price') !== -1 || ql.indexOf('buy') !== -1 || ql.indexOf('10') !== -1 || ql.indexOf('20') !== -1) {
         ans = window.tSlot('pr_sub', currentLang) + '<br><br>• <b>TALOS LITE:</b> ' + window.tSlot('lite_price_main', currentLang) + '<br>• <b>TALOS PRO:</b> ' + window.tSlot('pro_price_main', currentLang);
     } else {
         ans = window.tSlot('bot_ans_pro_vs_lite', currentLang) +
-              '<br><br><button class="quick-q-btn" onclick="closeModal('bot-modal'); openEmailActionModal('support');">✉ ' +
+              '<br><br><button class="quick-q-btn" onclick="closeModal(\'bot-modal\'); openEmailActionModal(\'support\');">✉ ' +
               (window.tSlot('em_hdr', currentLang) || 'Написати інженеру TALOS') + '</button>';
     }
 
@@ -4494,45 +4517,10 @@ window.sendCustomBotMsg = function() {
     log.scrollTop = log.scrollHeight;
 };
 
-// 8. БУРГЕР-МЕНЮ ТА СЕКРЕТНИЙ РАДАР АДМІНІСТРАТОРА ('zevs' / 'яумі' або фізичні клавіші KeyZ+KeyE+KeyV+KeyS + PIN 1313):
-window.toggleMobileNav = function(ev) {
-    if (ev) ev.stopPropagation();
-    var drawer = document.getElementById('mobile-nav-drawer');
-    var btn = document.getElementById('burger-toggle-btn');
-    var langMenu = document.getElementById('lang-menu');
-    if (langMenu) langMenu.classList.remove('show');
-    if (drawer) drawer.classList.toggle('mobile-open');
-    if (btn) btn.classList.toggle('open');
-};
-
-window.closeMobileNav = function() {
-    var drawer = document.getElementById('mobile-nav-drawer');
-    var btn = document.getElementById('burger-toggle-btn');
-    if (drawer) drawer.classList.remove('mobile-open');
-    if (btn) btn.classList.remove('open');
-};
-
-document.addEventListener('click', function(ev) {
-    var drawer = document.getElementById('mobile-nav-drawer');
-    var btn = document.getElementById('burger-toggle-btn');
-    if (drawer && drawer.classList.contains('mobile-open')) {
-        if (!drawer.contains(ev.target) && (!btn || !btn.contains(ev.target))) {
-            window.closeMobileNav();
-        }
-    }
-});
-
+// 8. СЕКРЕТНИЙ РАДАР АДМІНІСТРАТОРА ('zevs' / 'яумі' або KeyZ+KeyE+KeyV+KeyS + ПРЯМИЙ PIN 1313):
 var _secretBuf = '';
 var _codeBuf = '';
-// Точний DJB2-дайджест для '1313' (2089291725) + еталонний SHA-256 хеш сервера:
-var _PIN_DIGEST = 2089291725;
 var _EXPECTED_SRV_SHA256 = 'b6a0c6e58f4899622e58585b4628d88a885c27b9e96707c079e882b1d452f09a';
-
-function _hHash(s) {
-    var h = 5381;
-    for (var i = 0; i < s.length; i++) h = ((h << 5) + h) + s.charCodeAt(i);
-    return h & 0x7fffffff;
-}
 
 document.addEventListener('keydown', function(e) {
     var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
@@ -4552,20 +4540,21 @@ document.addEventListener('keydown', function(e) {
         if (sessionStorage.getItem('talos_diag_auth') === '1') {
             window.showUnlockedRadarWindow();
         } else {
-            document.getElementById('admin-pin-input').value = '';
-            document.getElementById('pin-err-msg').textContent = '';
+            var pinInp = document.getElementById('admin-pin-input');
+            var pinErr = document.getElementById('pin-err-msg');
+            if (pinInp) pinInp.value = '';
+            if (pinErr) pinErr.textContent = '';
             window.openModal('pin-modal');
-            setTimeout(function() { document.getElementById('admin-pin-input').focus(); }, 100);
+            setTimeout(function() { if (pinInp) pinInp.focus(); }, 100);
         }
     }
 });
 
 window.verifyCustomPinModal = async function() {
     var entered = (document.getElementById('admin-pin-input').value || '').trim();
-    var isPinCorrect = (_hHash(entered) === 2088291725 || entered === String(1300 + 13));
-    if (isPinCorrect) {
+    if (entered === '1313') {
         sessionStorage.setItem('talos_diag_auth', '1');
-        sessionStorage.setItem('talos_srv_sha256', 'b6a0c6e58f4899622e58585b4628d88a885c27b9e96707c079e882b1d452f09a');
+        sessionStorage.setItem('talos_srv_sha256', _EXPECTED_SRV_SHA256);
         window.closeModal('pin-modal');
         window.renderReviewsList();
         window.showUnlockedRadarWindow();
@@ -4579,7 +4568,7 @@ window.showUnlockedRadarWindow = async function() {
     var statusEl = document.getElementById('radar-cloud-status');
     if (statusEl) statusEl.textContent = '⏳ Синхронізація з хмарним сервером TALOS SHIELD...';
 
-    var srvKey = sessionStorage.getItem('talos_srv_sha256') || '';
+    var srvKey = sessionStorage.getItem('talos_srv_sha256') || _EXPECTED_SRV_SHA256;
     try {
         var res = await fetch(getCloudUrl() + '?auth=' + encodeURIComponent(srvKey));
         var data = await res.json();
@@ -4631,7 +4620,6 @@ window.renderRadarDashboard = function() {
                                 '<div>🟡 Смартфони: <b>' + mobCount + ' (' + mobPct + '%)</b></div>';
     }
 
-    // Відмальовування графіків Топ Країн та Джерел трафіку:
     var countryCounts = {}, sourceCounts = {};
     visits.forEach(function(v) {
         var c = (v.loc || 'Unknown').split(',')[0].trim() || 'Unknown';
