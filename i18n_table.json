@@ -4066,5 +4066,41 @@
     "sv": "Bättre och bättre. Snart perfekt)",
     "tr": "Giderek daha iyi oluyor. Neredeyse kusursuz)",
     "ko": "갈수록 좋아지네요. 곧 완벽해질 듯)"
+  },
+  "rev_item_4_hw": {
+    "uk": "4070",
+    "en": "4070",
+    "de": "4070",
+    "fr": "4070",
+    "pl": "4070",
+    "es": "4070",
+    "it": "4070",
+    "bg": "4070",
+    "ja": "4070",
+    "cs": "4070",
+    "ro": "4070",
+    "nl": "4070",
+    "pt": "4070",
+    "sv": "4070",
+    "tr": "4070",
+    "ko": "4070"
+  },
+  "rev_item_4_txt": {
+    "uk": "Хрінь якась,наляписто і не гарно.Приберіть ці тупі іконки з сайту.",
+    "en": "Total garbage, cluttered and ugly. Get rid of those stupid icons on the site.",
+    "de": "Totaler Schrott, überladen und hässlich. Nehmt diese dämlichen Icons von der Seite.",
+    "fr": "De la vraie merde, fouillis et moche. Retirez ces icônes débiles du site.",
+    "pl": "Totalny szajs, napchane i brzydkie. Wywalcie te głupie ikony ze strony.",
+    "es": "Una basura total, recargado y feo. Saquen esos iconos estúpidos del sitio.",
+    "it": "Una vera schifezza, confusionario e brutto. Togliete quelle icone idiote dal sito.",
+    "bg": "Пълна боза, натруфено и грозно. Махнете тези тъпи иконки от сайта.",
+    "ja": "マジでクソ、ごちゃごちゃしててダサい。サイトからあんなバカげたアイコン消せよ。",
+    "cs": "Totální sračka, přeplácané a ošklivé. Zbavte se těch blbejch ikon na webu.",
+    "ro": "O mizerie totală, aglomerat și urât. Scoateți iconițele alea idioate de pe site.",
+    "nl": "Totale rommel, druk en lelijk. Haal die stomme icoontjes van de site.",
+    "pt": "Lixo total, poluído e feio. Tirem esses ícones estúpidos do site.",
+    "sv": "Totalt skräp, rörigt och fult. Bort med de där dumma ikonerna från sajten.",
+    "tr": "Tam bir saçmalık, karmaşık ve çirkin. Sitedeki o aptal simgeleri kaldırın.",
+    "ko": "완전 쓰레기네, 조잡하고 구려. 사이트에서 그 멍청한 아이콘들 좀 치워."
   }
 }
