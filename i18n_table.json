@@ -4138,5 +4138,41 @@
     "sv": "Håller med, ser sjukt snyggt ut.",
     "tr": "Katılıyorum, cidden çok iyi duruyor.",
     "ko": "동감이야, 엄청 예쁘네."
+  },
+  "rev_item_6_hw": {
+    "uk": "Йди в дупу",
+    "en": "Fuck off",
+    "de": "Verpiss dich",
+    "fr": "Va te faire foutre",
+    "pl": "Spierdalaj",
+    "es": "Vete a la mierda",
+    "it": "Vaffanculo",
+    "bg": "Мършник такъв",
+    "ja": "くそくらえ",
+    "cs": "Jdi do prdele",
+    "ro": "Dă-te dracului",
+    "nl": "Flikker op",
+    "pt": "Vai se foder",
+    "sv": "Dra åt helvete",
+    "tr": "Siktir git",
+    "ko": "꺼져"
+  },
+  "rev_item_6_txt": {
+    "uk": "Ти пес свинособаки.",
+    "en": "You are a pig-dog's hound.",
+    "de": "Du bist der Köter eines Schweinehunds.",
+    "fr": "T'es un chien de porc.",
+    "pl": "Jesteś psem świniopsa.",
+    "es": "Eres un perro de cerdo.",
+    "it": "Sei il cane di un cane di maiale.",
+    "bg": "Ти си куче на свинокуче.",
+    "ja": "お前は豚犬の犬だ。",
+    "cs": "Ty jsi pes svinopsa.",
+    "ro": "Ești un câine de porc.",
+    "nl": "Jij bent de hond van een varkenshond.",
+    "pt": "Você é um cão de porco.",
+    "sv": "Du är en svinhunds köter.",
+    "tr": "Domuz köpeğinin evladısın.",
+    "ko": "너는 돼지 같은 녀석의 개야."
   }
 }
