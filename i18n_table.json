@@ -4030,5 +4030,41 @@
     "sv": "LICENSAVTAL FÖR SLUTANVÄNDARE (EULA) — TALOS 60FPS v6.5\nUtvecklare: TALOS VISION LABS (Odesa, Ukraina) | Support: talosvision.labs@gmail.com\n\n1. AVTALETS SYFTE OCH OPEN-SOURCE-EFTERLEVNAD (GPLv3 / LGPL)\nDetta avtal reglerar användningen av \"TALOS Setup Wizard\", \"Control Center MPC\" och \"TALOS SHIELD\". Öppen källkodskomponenter (MPC-HC, VapourSynth, AviSynth+, MVTools2, RIFE) tillhandahålls kostnadsfritt under sina respektive GPLv3/LGPL-licenser.\n\n2. REGEL \"1 LICENS = 1 ENHET (SHA-256 HWID)\"\n• Varje licensnyckel ger rätt till aktivering på EN (1) fysisk enhet (knuten till SHA-256 HWID).\n• Ominstallation på SAMMA dator (även efter ominstallation av Windows) är obegränsad.\n• Utgåvan \"TALOS Portable (-50%)\" är uteslutande licensierad för Windows-surfplattor med pekskärm.\n\n3. ANSVARSFRISKRIVNING (AS-IS)\nPROGRAMVARAN TILLHANDAHÅLLS \"I BEFINTLIGT SKICK\" (AS-IS), UTAN GARANTIER.",
     "tr": "SON KULLANICI LİSANS SÖZLEŞMESİ (EULA) — TALOS 60FPS v6.5\nGeliştirici: TALOS VISION LABS (Odesa, Ukrayna) | Destek: talosvision.labs@gmail.com\n\n1. SÖZLEŞMENİN KONUSU VE AÇIK KAYNAK UYUMU (GPLv3 / LGPL)\nBu sözleşme, \"TALOS Setup Wizard\" kurulum sihirbazı, \"Control Center MPC\" uygulaması ve \"TALOS SHIELD\" doğrulama sisteminin kullanımını düzenler. Açık kaynaklı bileşenler (MPC-HC, VapourSynth, AviSynth+, MVTools2, RIFE) kendi GPLv3/LGPL lisansları altında ücretsiz sunulmaktadır.\n\n2. \"1 LİSANS = 1 CİHAZ (SHA-256 HWID)\" KURALI\n• Her lisans anahtarı YALNIZCA BİR (1) fiziksel cihazda (SHA-256 HWID'ye bağlı) etkinleştirme hakkı verir.\n• AYNI bilgisayara yeniden kurulum (Windows formatı sonrası dahil) sınırsızdır.\n• \"TALOS Portable (-50%)\" sürümü yalnızca dokunmatik ekranlı Windows tabletler içindir.\n\n3. GARANTİ REDDİ (AS-IS)\nYAZILIM \"OLDUĞU GİBİ\" (AS-IS) SUNULMAKTADIR VE HİÇBİR GARANTİ VERİLMEZ.",
     "ko": "최종 사용자 라이선스 계약서 (EULA) — TALOS 60FPS v6.5\n개발사: TALOS VISION LABS (우크라이나 오데사) | 지원: talosvision.labs@gmail.com\n\n1. 계약 목적 및 오픈소스 라이선스 준수 (GPLv3 / LGPL)\n본 계약은 독점 설치 마법사 \"TALOS Setup Wizard\", 제어판 애플리케이션 \"Control Center MPC\" 및 클라우드 인증 시스템 \"TALOS SHIELD\"의 사용을 규정합니다. 오픈소스 비디오 구성 요소(MPC-HC, VapourSynth, AviSynth+, MVTools2, RIFE)는 각각의 GPLv3/LGPL 라이선스에 따라 무료로 배포되며, 라이선스 비용은 독점 TALOS 자동화 소프트웨어 및 기술 지원에만 적용됩니다.\n\n2. \"1 라이선스 = 1 기기 (SHA-256 HWID)\" 정책\n• 각 라이선스 키는 단 하나(1)의 물리적 기기(CPU 및 메인보드 SHA-256 HWID에 바인딩됨)에서만 활성화할 수 있습니다.\n• 동일한 PC에서의 재설치(Windows 재설치 후 포함)는 무제한 무료입니다.\n• 프로모션 에디션 \"TALOS Portable (-50%)\"은 터치스크린 Windows 태블릿 전용입니다.\n\n3. 보증 부인 (AS-IS)\n본 소프트웨어는 어떠한 보증도 없이 \"있는 그대로(AS-IS)\" 제공됩니다."
+  },
+  "rev_item_3_hw": {
+    "uk": "4070",
+    "en": "4070",
+    "de": "4070",
+    "fr": "4070",
+    "pl": "4070",
+    "es": "4070",
+    "it": "4070",
+    "bg": "4070",
+    "ja": "4070",
+    "cs": "4070",
+    "ro": "4070",
+    "nl": "4070",
+    "pt": "4070",
+    "sv": "4070",
+    "tr": "4070",
+    "ko": "4070"
+  },
+  "rev_item_3_txt": {
+    "uk": "Все краще і краще.Скоро буде ідеал)",
+    "en": "Getting better and better. Almost perfection)",
+    "de": "Wird immer besser. Bald perfekt)",
+    "fr": "De mieux en mieux. Bientôt la perfection)",
+    "pl": "Coraz lepiej. Prawie ideał)",
+    "es": "Cada vez mejor. Casi la perfección)",
+    "it": "Sempre meglio. Quasi la perfezione)",
+    "bg": "Все по-добре и по-добре. Скоро ще е идеално)",
+    "ja": "どんどん良くなっている。もうすぐ完璧)",
+    "cs": "Stále lepší a lepší. Brzy to bude dokonalé)",
+    "ro": "Tot mai bine. Aproape de perfecțiune)",
+    "nl": "Wordt steeds beter. Bijna perfect)",
+    "pt": "Cada vez melhor. Quase perfeito)",
+    "sv": "Bättre och bättre. Snart perfekt)",
+    "tr": "Giderek daha iyi oluyor. Neredeyse kusursuz)",
+    "ko": "갈수록 좋아지네요. 곧 완벽해질 듯)"
   }
 }
