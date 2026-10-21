@@ -59,4 +59,18 @@ window.TALOS_APPROVED_REVIEWS = [
         "date": "21.10.2026",
         "email": "talosvision.labs@gmail.com"
 }
+,
+    {
+        "nameUk": "123",
+        "nameEn": "123",
+        "edition": "PRO",
+        "hwUk": "4070",
+        "hwEn": "4070",
+        "stars": 2,
+        "updatedBadge": false,
+        "textUk": "Хрінь якась,наляписто і не гарно.Приберіть ці тупі іконки з сайту.",
+        "textEn": "Хрінь якась,наляписто і не гарно.Приберіть ці тупі іконки з сайту.",
+        "date": "21.10.2026",
+        "email": "talosvision.labs@gmail.com"
+}
 ];
