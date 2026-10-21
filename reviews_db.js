@@ -87,4 +87,18 @@ window.TALOS_APPROVED_REVIEWS = [
         "date": "21.10.2026",
         "email": "Не вказано"
 }
+,
+    {
+        "nameUk": "В рот тобі ноги",
+        "nameEn": "В рот тобі ноги",
+        "edition": "PRO",
+        "hwUk": "Йди в дупу",
+        "hwEn": "Йди в дупу",
+        "stars": 1,
+        "updatedBadge": false,
+        "textUk": "Ти пес свинособаки.",
+        "textEn": "Ти пес свинособаки.",
+        "date": "21.10.2026",
+        "email": "Не вказано"
+}
 ];
