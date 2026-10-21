@@ -1999,6 +1999,14 @@
             }
         }
 
+    
+        /* ЗСУВ ВЕРХНЬОЇ ШАПКИ ВЛІВО НА ПІВ КНОПКИ МОВИ (-27px) НА ЯПОНСЬКІЙ ЛОКАЛІЗАЦІЇ (v10.13) */
+        @media (min-width: 961px) {
+            body.lang-ja nav .container.nav-wrap {
+                transform: translateX(-27px);
+            }
+        }
+
     </style>
 
 </head>
@@ -3807,6 +3815,7 @@ document.addEventListener('click', function(ev) {
 window.selectLang = async function(lang, labelCode, save) {
     if (save === undefined) save = true;
     currentLang = lang || 'uk';
+    document.body.classList.toggle('lang-ja', currentLang === 'ja');
     if (save) {
         try { localStorage.setItem('talos_lang', currentLang); } catch (e) {}
     }
@@ -4419,7 +4428,7 @@ window.openDevReplyBuilder = function(idx) {
     window.openModal('dev-reply-modal');
 };
 
-window.applyDevReplyAndCopyJson = function() {
+window.applyDevReplyAndCopyJson = async function() {
     var txt = (document.getElementById('dev-reply-textarea').value || '').trim();
     if (!txt) return;
     var allReviews = window._CURRENT_MERGED_REVIEWS || [];
@@ -4434,11 +4443,26 @@ window.applyDevReplyAndCopyJson = function() {
     target.devReplyEn = txt;
     target.devReplyDate = dateTimeStr;
 
-    var cleanClone = Object.assign({}, target);
-    delete cleanClone.email;
-    navigator.clipboard.writeText(JSON.stringify(cleanClone, null, 8));
     window.renderReviewsList();
     window.closeModal('dev-reply-modal');
+
+    try {
+        await fetch(getCloudUrl(), {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+                type: 'SAVE_DEV_REPLY',
+                sendEmail: false,
+                nameUk: target.nameUk || target.nameEn || '',
+                textUk: target.textUk || '',
+                devReplyUk: txt,
+                devReplyDate: dateTimeStr,
+                edition: target.edition || 'PRO'
+            })
+        });
+    } catch (e) {}
+    setTimeout(reloadReviewsAndDictFromServer, 20000);
 };
 
 // ВІДПРАВКА КІБЕРПАНК HTML-ЛИСТА КЛІЄНТУ ЧЕРЕЗ ХМАРНИЙ СЕРВЕР TALOS (Пункт 3 — замість сірого тексту Gmail!):
@@ -4458,7 +4482,8 @@ window.notifyReviewerByGmail = async function() {
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({
-                    type: 'SEND_DEV_REPLY',
+                    type: 'SAVE_DEV_REPLY',
+                    sendEmail: true,
                     email: toEmail,
                     nameUk: target.nameUk || target.nameEn || 'Клієнт TALOS',
                     textUk: target.textUk || '',
