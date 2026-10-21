@@ -73,4 +73,18 @@ window.TALOS_APPROVED_REVIEWS = [
         "date": "21.10.2026",
         "email": "talosvision.labs@gmail.com"
 }
+,
+    {
+        "nameUk": "123",
+        "nameEn": "123",
+        "edition": "PRO",
+        "hwUk": "4070",
+        "hwEn": "4070",
+        "stars": 5,
+        "updatedBadge": true,
+        "textUk": "Згоден,так гарно.",
+        "textEn": "Згоден,так гарно.",
+        "date": "21.10.2026",
+        "email": "Не вказано"
+}
 ];
