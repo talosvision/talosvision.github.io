@@ -4102,5 +4102,41 @@
     "sv": "Totalt skräp, rörigt och fult. Bort med de där dumma ikonerna från sajten.",
     "tr": "Tam bir saçmalık, karmaşık ve çirkin. Sitedeki o aptal simgeleri kaldırın.",
     "ko": "완전 쓰레기네, 조잡하고 구려. 사이트에서 그 멍청한 아이콘들 좀 치워."
+  },
+  "rev_item_5_hw": {
+    "uk": "4070",
+    "en": "4070",
+    "de": "4070",
+    "fr": "4070",
+    "pl": "4070",
+    "es": "4070",
+    "it": "4070",
+    "bg": "4070",
+    "ja": "4070",
+    "cs": "4070",
+    "ro": "4070",
+    "nl": "4070",
+    "pt": "4070",
+    "sv": "4070",
+    "tr": "4070",
+    "ko": "4070"
+  },
+  "rev_item_5_txt": {
+    "uk": "Згоден,так гарно.",
+    "en": "Agreed, looks so nice.",
+    "de": "Stimmt, sieht echt nice aus.",
+    "fr": "D'accord, ça rend super bien.",
+    "pl": "Zgadzam się, wygląda mega.",
+    "es": "De acuerdo, se ve genial.",
+    "it": "Concordo, ci sta un sacco.",
+    "bg": "Съгласен, изглежда супер.",
+    "ja": "同意、めっちゃいい感じ。",
+    "cs": "Souhlasím, vypadá to fakt skvěle.",
+    "ro": "De acord, arată super bine.",
+    "nl": "Eens, ziet er echt nice uit.",
+    "pt": "Concordo, ficou irado.",
+    "sv": "Håller med, ser sjukt snyggt ut.",
+    "tr": "Katılıyorum, cidden çok iyi duruyor.",
+    "ko": "동감이야, 엄청 예쁘네."
   }
 }
