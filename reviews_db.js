@@ -45,4 +45,18 @@ window.TALOS_APPROVED_REVIEWS = [
         devReplyEn: "Thank you for the high rating, Andriy! Enjoy your movies on the big screen!",
         devReplyDate: "16.10.2026 20:05"
     }
+,
+    {
+        "nameUk": "Знову тести",
+        "nameEn": "Знову тести",
+        "edition": "PRO",
+        "hwUk": "4070",
+        "hwEn": "4070",
+        "stars": 5,
+        "updatedBadge": false,
+        "textUk": "Вже добре,а буде ще краще))",
+        "textEn": "Вже добре,а буде ще краще))",
+        "date": "23.10.2026",
+        "email": "talosvision.labs@gmail.com"
+}
 ];
