@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://talosvision.github.io/sitemap.xml
